@@ -31,7 +31,7 @@ function receiveItemListFromBackgroundPage(callback) {
 function placeItemListMarkersOnMap(map, itemList) {
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
     getInfowindowTemplate(getInfowindowTemplateCallback);
-        
+    
     function getInfowindowTemplateCallback(template) {
         $.each(itemList, iterateOverNextItem);
         
@@ -48,6 +48,10 @@ function placeItemListMarkersOnMap(map, itemList) {
              
         }
     }
+    
+    google.maps.event.addListener(map, "click", function(event) {
+        infowindow.close();
+    });
 }
 
 function addMarkerToMap(map, location, callback) {
