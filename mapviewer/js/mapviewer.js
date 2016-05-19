@@ -40,7 +40,6 @@ function placeItemListMarkersOnMap(map, itemList) {
              addMarkerToMap(map, item.location, addMarkerToMapCallback);
              
             function addMarkerToMapCallback(marker) {
-                console.log('addMarkerToMapCallback');
                 marker.addListener('click', function() {
                     infowindow.setContent(iwContent);
                     infowindow.open(map, marker);
@@ -59,7 +58,6 @@ function addMarkerToMap(map, location, callback) {
             getJSONFromGoogleAPI();
         } else {
             var object = JSON.parse(geocode);
-            console.log(geocode);
             createMarker(object.lat, object.lng);
         }
     }
@@ -70,7 +68,6 @@ function addMarkerToMap(map, location, callback) {
     }
     
     function getJSONFromGoogleAPICallback(data) {
-        console.log('getJSONFromGoogleAPICallback');
         if (data.status != 'OK') {
             console.log('Geocode overload or service down.');
             console.log(data);
@@ -121,6 +118,8 @@ function fillInfowindowTemplateWithItem(template, item) {
     content = content.replace('__PRICE__', item.price);
     content = content.replace('__LINKURL__', item.linkUrl);
     content = content.replace('__PICTUREURL__', item.pictureUrl);
+    if (!item.pictureUrl) {content.replace('__HIDDEN__', 'hidden');}
+    else {content.replace('__HIDDEN__', '');}
     return content;
 }
 

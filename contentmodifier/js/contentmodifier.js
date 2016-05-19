@@ -17,9 +17,7 @@ $(document).ready(function() {
 
     //Get the map hidden status from the background page
     chrome.extension.sendMessage({method: 'getMapHidden'}, getMapHiddenCallback);
-    function getMapHiddenCallback(response) {
-        console.log(response);
-        
+    function getMapHiddenCallback(response) {        
          //Load the html file to inject in the page
          $.get(url, function(content) {injectedContentReceived(content, titleNode, response.mapHidden)}, 'html');
     }
