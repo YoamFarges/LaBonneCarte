@@ -1,41 +1,16 @@
-<style>
-    h2 {font-size: 16px; color: #369;}
-    .pull-right {float: right;}
-    .pull-left {float: left;}
-    .clearfix {clear: both;}
-    .right {text-align: right;}
-    
-    .price {font-size: 16px; font-weight: bold; color: #f56b2b;}
-    
-    h2 {margin: 0; margin-bottom: 8px; margin-top: 5px;}
-    p {margin: 0; margin-bottom: 5px;}
-    p + p {margin-top: 5px;}
-    
-    .date {padding-right: 5px;}
-    hr {border: none; border-bottom: 1px solid #eee;}
-    
-    img {max-height: 100px;}
-    img.center {
-        display: block;
-        margin: 0 auto;
-    }
-    
-    .hidden {display:none;}
-    .bg {background: #eee;}
-</style>
 <div id="content">
-    <div class="bg __HIDDEN__">
-        <img class="center" src="__PICTUREURL__" />
+    <div class="bg __HIDDEN__" style="background: #eee">
+        <img class="center" src="__PICTUREURL__" style="max-height: 100px;display: block;margin: 0 auto"/>
     </div>
-    <h2 id="firstHeading" class="firstHeading">__TITLE__</h2>
+    <h2 id="firstHeading" class="firstHeading" style="font-size: 16px;color: #369;margin: 0;margin-bottom: 8px;margin-top: 5px">__TITLE__</h2>
     <div id="bodyContent">
-        <p class="price">__PRICE__</p>
-        <p>__CATEGORY__</p>
-        <p>__LOCATION__</p>
-        <hr>
-        <div class="clearfix">
-            <p class="pull-left date">__DATE__</p>
-            <a href="__LINKURL__" target="_blank" class="pull-right right">Voir l'annonce ></a>
+        <p class="price" style="font-size: 16px;font-weight: bold;color: #f56b2b;margin: 0;margin-bottom: 5px">__PRICE__</p>
+        <p style="margin: 0;margin-bottom: 5px;margin-top: 5px">__CATEGORY__</p>
+        <p style="margin: 0;margin-bottom: 5px;margin-top: 5px">__LOCATION__</p>
+        <hr style="border: none;border-bottom: 1px solid #eee"/>
+        <div class="clearfix" style="clear: both">
+            <p class="pull-left date" style="float: left;margin: 0;margin-bottom: 5px;padding-right: 5px">__DATE__</p>
+            <a href="__LINKURL__" target="_blank" class="pull-right right" style="float: right;text-align: right">Voir l'annonce &gt;</a>
         </div>
     </div>
 </div>
