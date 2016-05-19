@@ -30,53 +30,68 @@ function receiveItemListFromBackgroundPage(callback) {
 
 function placeItemListMarkersOnMap(map, itemList) {
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
-    
-    getInfowindowTemplate(function(template) {
-        $.each(itemList, function(index, item) {
-            var iwContent = fillInfowindowTemplateWithItem(template, item);
-            addMarkerToMap(map, item.location, function(marker) {
+    getInfowindowTemplate(getInfowindowTemplateCallback);
+        
+    function getInfowindowTemplateCallback(template) {
+        $.each(itemList, iterateOverNextItem);
+        
+        function iterateOverNextItem(index, item) {
+             var iwContent = fillInfowindowTemplateWithItem(template, item);
+             addMarkerToMap(map, item.location, addMarkerToMapCallback);
+             
+            function addMarkerToMapCallback(marker) {
+                console.log('addMarkerToMapCallback');
                 marker.addListener('click', function() {
                     infowindow.setContent(iwContent);
                     infowindow.open(map, marker);
                 });
-            });
-        });
-    });    
+            }
+             
+        }
+    }
 }
 
 function addMarkerToMap(map, location, callback) {
     chrome.extension.sendMessage({method: 'searchGeocode', location:location}, searchGeocodeCallback);
     
-    function searchGeocodeCallback(geocode) {     
-        if (geocode == null || geocode === undefined) {
+    function searchGeocodeCallback(geocode) {        
+        if (geocode == null) {
             getJSONFromGoogleAPI();
         } else {
-            createMarker(geocode.lat, geocode.lon);
+            var object = JSON.parse(geocode);
+            console.log(geocode);
+            createMarker(object.lat, object.lng);
         }
     }
     
     function getJSONFromGoogleAPI() {
-
+        var url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=' + location;
         chrome.extension.sendMessage({method: 'getJSON', url:url}, getJSONFromGoogleAPICallback);   
     }
     
     function getJSONFromGoogleAPICallback(data) {
+        console.log('getJSONFromGoogleAPICallback');
         if (data.status != 'OK') {
             console.log('Geocode overload or service down.');
             console.log(data);
+            
+            //Retry in 5s
+            console.log('... will retry in 5 seconds');
+            setTimeout(getJSONFromGoogleAPI, 5000)
+            
             return;
         }
         
         var p = data.results[0].geometry.location;
-        insertGeocode(location, p.lat, p.lon);
-        createMarker(p.lat, p.lon);
+        insertGeocode(location, p.lat, p.lng);
+        createMarker(p.lat, p.lng);
     }
 
-    function insertGeocode(location, lat, lon) {
-        chrome.extension.sendMessage({method: 'insertGeocode', location:location, lat:lat, lon:lon});
+    function insertGeocode(location, lat, lng) {
+        chrome.extension.sendMessage({method: 'insertGeocode', location:location, lat:lat, lng:lng});
     }
     
-    function createMarker(lat, lon) {
+    function createMarker(lat, lng) {        
         var latlng = new google.maps.LatLng(lat, lng);
         var marker = new google.maps.Marker({
             position: latlng,

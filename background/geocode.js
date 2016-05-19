@@ -1,5 +1,5 @@
-var Geocode = function(location, lat, lon) {
+var Geocode = function(location, lat, lng) {
     this.location = location;
     this.lat = lat;
-    this.lon = lon;
+    this.lng = lng;
 }

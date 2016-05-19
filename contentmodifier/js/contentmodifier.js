@@ -1,7 +1,7 @@
 /*-------------------------*\
     ENTRY POINT
 \*-------------------------*/
-var iframeIsInitiallyHidden = true;
+var iframeIsInitiallyHidden = false;
 
 $(document).ready(function() {
     //Guard
@@ -56,7 +56,7 @@ function sendItemsToBackgroundPage(itemList) {
 }
 
 function updateButtonText(button, hidden) {
-    button.html(hidden ? 'Afficher la carte' : 'Enlever la carte');
+    button.html(hidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
 }
 
 /*-------------------------*\
