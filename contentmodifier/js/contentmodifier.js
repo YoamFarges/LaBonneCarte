@@ -33,8 +33,9 @@ function injectedContentReceived(injectedContent, nodeToInjectAfter, mapIsHidden
     var button = $('#lbca_button');
     updateButtonText(button, mapIsHidden);
     
-    var footer = getFooterPagination().clone();
-    hideContainer.append(footer);
+    //Clone the pagination just below the map
+    var footer = getFooterPagination();
+    if (footer) {hideContainer.append(footer.clone());}
     
     if (mapIsHidden) {
         hideContainer.hide();
