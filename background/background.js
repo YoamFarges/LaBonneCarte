@@ -10,7 +10,7 @@ var mapHidden = true;
 var itemList = null;
 var cachedGeocodeList = [];
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-     if (request.method == "setMapHidden" && request.itemList) {
+     if (request.method == "setMapHidden") {
         mapHidden = request.mapHidden;
     } else if (request.method == "getMapHidden") {
         sendResponse({mapHidden: mapHidden});

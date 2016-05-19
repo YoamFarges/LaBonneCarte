@@ -15,21 +15,30 @@ $(document).ready(function() {
    //Send the item list to the background page
     sendItemsToBackgroundPage(itemList);
 
-    //Load the html file to inject in the page
-    $.get(url, function(content) {injectedContentReceived(content, titleNode)}, 'html');
+    //Get the map hidden status from the background page
+    chrome.extension.sendMessage({method: 'getMapHidden'}, getMapHiddenCallback);
+    function getMapHiddenCallback(response) {
+        console.log(response);
+        
+         //Load the html file to inject in the page
+         $.get(url, function(content) {injectedContentReceived(content, titleNode, response.mapHidden)}, 'html');
+    }
 });
 
 /*-------------------------*\
     INJECT PAGE ELEMENTS
 \*-------------------------*/
 
-function injectedContentReceived(injectedContent, nodeToInject) {
-    $(injectedContent).insertAfter(nodeToInject);
+function injectedContentReceived(injectedContent, nodeToInjectAfter, mapIsHidden) {
+    $(injectedContent).insertAfter(nodeToInjectAfter);
     var hideContainer = $('#lbca_hide_container');
     var button = $('#lbca_button');
-    updateButtonText(button, iframeIsInitiallyHidden);
+    updateButtonText(button, mapIsHidden);
     
-    if (iframeIsInitiallyHidden) {
+    var footer = getFooterPagination().clone();
+    hideContainer.append(footer);
+    
+    if (mapIsHidden) {
         hideContainer.hide();
     } else {
         loadIframeIfNecessary();
@@ -39,7 +48,9 @@ function injectedContentReceived(injectedContent, nodeToInject) {
         loadIframeIfNecessary(); 
                
         hideContainer.slideToggle(100, function() {
-            updateButtonText(button, hideContainer.is(":hidden"));
+            var hidden = hideContainer.is(":hidden");
+            saveMapHiddenState(hidden);
+            updateButtonText(button, hidden);
         });
     });
 }
@@ -59,6 +70,10 @@ function updateButtonText(button, hidden) {
     button.html(hidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
 }
 
+function saveMapHiddenState(hidden) {
+    chrome.extension.sendMessage({method: 'setMapHidden', mapHidden:hidden});
+}
+
 /*-------------------------*\
     PARSE THE CURRENT PAGE
 \*-------------------------*/
@@ -71,5 +86,10 @@ function updateButtonText(button, hidden) {
 function getPageTitleNode() {
      var titleNode = $('#main > section:first').children('h1').first();
      return titleNode.length ? titleNode : null;
+}
+
+function getFooterPagination() {
+    var pagination = $("footer.pagination");
+    return pagination.length ? pagination : null;
 }
 
