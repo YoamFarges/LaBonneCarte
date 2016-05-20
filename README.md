@@ -7,6 +7,8 @@ Leboncoin is the main website to buy and sell stuff in France, but for some reas
 Basically, the extension parse every leboncoin html page to gather the page's product list data (title, price... and more importantly the location), and, if pertinent, display a google maps on top of the page.
 
 ### How is the code working?
+_Real brief explanation, if you want more information or a detailed blog post, feel free to contact me._
+
 The main part of the extension is contentmodifier.js, a _content_scripts_ running on all pages of leboncoin.fr. 
 On every page load, it will try to gather the product list from the page. If it succeeds, it means that we are in a search list page.
 - We then use chrome messaging store the current itemlist on the background.js file : the persistent file of the extension.
@@ -25,8 +27,8 @@ _web_accessible_resources_ is also necessary to inject images or code or html in
 ### What's left to do?
 *Please feel free to participate or improve the code.*
 - [ ] Correct the map markers overlap when two items are in the same city.
-- [ ] Central Paris area are not really working (* as the page displays things like 'Paris 15ème...'*), I need to find a fix.
-- [ ] Better architecture, at least a MVC.
+- [ ] Central Paris area are not really working (* as the page displays things like Paris 15ème...*), I need to find a fix.
+- [ ] Better architecture, at least really respect the MVC.
 - [ ] Unit tests.
 
 ### Disclaimer
