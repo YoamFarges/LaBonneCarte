@@ -1,12 +1,13 @@
 # LaBonneCarte
-_A chrome extension to display leboncoin's (a french craigslist) search results on a Google map._
+_A **chrome extension** to display leboncoin's (a french craigslist) search results on a Google map._
 
-## Overview
 Leboncoin is the main website to buy and sell stuff in France, but for some reason, there is no way to display all the results of your search directly on a map. It was annoying so, in a free afternoon, I decided to fix it by creating my first chrome extension.
 
 Basically, the extension parse every leboncoin html page to gather the page's product list data (title, price... and more importantly the location), and, if pertinent, display a google maps on top of the page.
 
-### How is the code working?
+![Screenshot of LaBonneCarte in action](http://tof.canardpc.com/view/514e0085-4680-4579-a63d-cbeaa2b7417e.jpg)
+
+## How is the code working?
 _Real brief explanation, if you want more information or a detailed blog post, feel free to contact me._
 
 The main part of the extension is contentmodifier.js, a _content_scripts_ running on all pages of leboncoin.fr. 
@@ -32,5 +33,6 @@ _web_accessible_resources_ is also necessary to inject images or code or html in
 - [ ] Unit tests.
 
 ### Disclaimer
-The code was just a fun project for me, in order to learn how to make Chrome extensions. It is not really in a clean production state (no tests, no real architecture...). Use it at your own risk.
-Also I am not affiliated at all with leboncoin.
+- I am not affiliated at all with leboncoin.
+- The code was just a fun project for me, in order to learn how to make Chrome extensions. It is not really in a clean production state (no tests, no real architecture...). Use it at your own risk.
+- Some sentences of the extension are in french only as the target website is french only.
