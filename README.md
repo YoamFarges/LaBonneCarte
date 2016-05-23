@@ -1,5 +1,5 @@
 # LaBonneCarte
-_A **chrome extension** to display leboncoin's (a french craigslist) search results on a Google map._
+_A [**chrome extension**](https://chrome.google.com/webstore/developer/edit/oegacpncaonolgbpmphcimodilfoacnl?hl=en) to display leboncoin's (a french craigslist) search results on a Google map._
 
 Leboncoin is the main website to buy and sell stuff in France, but for some reason, there is no way to display all the results of your search directly on a map. It was annoying so, in a free afternoon, I decided to fix it by creating my first chrome extension.
 
