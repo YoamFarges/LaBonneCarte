@@ -6,8 +6,9 @@
 */
 Item.getItemListFromPage = function () {
     var array = [];
-        
-    $("ul.tabsContent li").each(function(index) {
+    
+    var itemList = $("section.tabsContent ul li");    
+    itemList.each(function(index) {
         var item = new Item();
         item.title = strip($(this).find(".item_title").text());
         item.price = strip($(this).find(".item_price").text());
@@ -20,7 +21,7 @@ Item.getItemListFromPage = function () {
         var pics = $(this).find(".item_imagePic .lazyload");
         item.pictureUrl = fixLink(pics.attr('data-imgsrc'));
         item.linkUrl = fixLink($(this).find("a").attr('href'));
-                        
+                
         array.push(item);
     });
         
