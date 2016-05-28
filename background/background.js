@@ -9,7 +9,7 @@
 var mapHidden = true;
 var itemList = null;
 var cachedGeocodeList = [];
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {    
      if (request.method == "setMapHidden") {
         mapHidden = request.mapHidden;
     } else if (request.method == "getMapHidden") {
@@ -19,11 +19,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else if (request.method == "getItemList") {
         sendResponse({itemList: itemList});
     } else if (request.method == "searchGeocode") {
-        var result = getCachedGeocodeWithLocation(request.location);
-        if (result) {result = JSON.stringify(result);}
-        sendResponse(result);
+        var geocode = getCachedGeocodeWithLocation(request.location);
+        if (geocode) {
+            sendResponse(geocode.serialized());
+        } else {
+            sendResponse(null);
+        }
     } else if (request.method == "insertGeocode") {
-        var geocode = new Geocode(request.location, request.lat, request.lng);
+        var geocode = Geocode.withJson(request.geocode);
         cachedGeocodeList.push(geocode);
     } else if (request.method == "getJSON") {
         $.getJSON(request.url, sendResponse);
@@ -36,12 +39,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 //Utils
 function getCachedGeocodeWithLocation(location) {
-    var result = null;
+    var geocode = null;
     $.each(cachedGeocodeList, function(index, item) {
         if (item.location == location) {
-            result = item;
-            return false;
+            geocode = item;
+            return false; //break;
         }
     });
-    return result;
+    return geocode;
 }

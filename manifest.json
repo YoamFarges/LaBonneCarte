@@ -28,7 +28,7 @@
     "background": {
         "scripts": [
         "shared/lib/jquery-2.2.3.min.js",
-        "background/geocode.js",
+        "shared/models/geocode.js",
         "background/background.js"
     ]},
     

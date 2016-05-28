@@ -4,6 +4,7 @@
 
 function googleMapsApiLoadedCallback() {
     var map = createMap();
+    
     receiveItemListFromBackgroundPage(function(itemList) {    
         placeItemListMarkersOnMap(map, itemList);
     });
@@ -25,84 +26,32 @@ function receiveItemListFromBackgroundPage(callback) {
 }
 
 /*-------------------------*\
-    MARKERS
+    ITEMS TO MARKERS
 \*-------------------------*/
 
 function placeItemListMarkersOnMap(map, itemList) {
+    var mapMarkers = [];
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
-    getInfowindowTemplate(getInfowindowTemplateCallback);
-    
-    function getInfowindowTemplateCallback(template) {
-        $.each(itemList, iterateOverNextItem);
-        
-        function iterateOverNextItem(index, item) {
-             var iwContent = fillInfowindowTemplateWithItem(template, item);
-             addMarkerToMap(map, item.location, addMarkerToMapCallback);
-             
-            function addMarkerToMapCallback(marker) {
+
+    getInfowindowTemplate(function (template) {
+        $.each(itemList, function iterateOverNextItem(index, item) {
+            var mapMarker = new MapMarker(item);
+            mapMarkers.push(mapMarker);
+            
+            mapMarker.loadGeocode(function() {   
+                var marker = mapMarker.createGoogleMarker(map, infowindow);
                 marker.addListener('click', function() {
-                    infowindow.setContent(iwContent);
+                    infowindow.setContent(mapMarker.infowindowContent(template));
                     infowindow.open(map, marker);
-                });
-            }
-             
-        }
-    }
+                }); //Listener
+            }); //load geocode
+        }); //iterate
+    }); //getInfoWindowTemplate
     
     google.maps.event.addListener(map, "click", function(event) {
         infowindow.close();
     });
 }
-
-function addMarkerToMap(map, location, callback) {
-    chrome.extension.sendMessage({method: 'searchGeocode', location:location}, searchGeocodeCallback);
-    
-    function searchGeocodeCallback(geocode) {        
-        if (geocode == null) {
-            getJSONFromGoogleAPI();
-        } else {
-            var object = JSON.parse(geocode);
-            createMarker(object.lat, object.lng);
-        }
-    }
-    
-    function getJSONFromGoogleAPI() {
-        var url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=' + location;
-        chrome.extension.sendMessage({method: 'getJSON', url:url}, getJSONFromGoogleAPICallback);   
-    }
-    
-    function getJSONFromGoogleAPICallback(data) {
-        if (data.status != 'OK') {
-            console.log('Geocode overload or service down.');
-            console.log(data);
-            
-            //Retry in 5s
-            console.log('... will retry in 5 seconds');
-            setTimeout(getJSONFromGoogleAPI, 5000)
-            
-            return;
-        }
-        
-        var p = data.results[0].geometry.location;
-        insertGeocode(location, p.lat, p.lng);
-        createMarker(p.lat, p.lng);
-    }
-
-    function insertGeocode(location, lat, lng) {
-        chrome.extension.sendMessage({method: 'insertGeocode', location:location, lat:lat, lng:lng});
-    }
-    
-    function createMarker(lat, lng) {        
-        var latlng = new google.maps.LatLng(lat, lng);
-        var marker = new google.maps.Marker({
-            position: latlng,
-            map: map,
-            animation: google.maps.Animation.DROP,
-        });
-        callback(marker);
-    }
-}
-
 
 /*-------------------------*\
     INFOWINDOW
@@ -112,19 +61,4 @@ function getInfowindowTemplate(callback) {
     var url = chrome.extension.getURL('mapviewer/html/infowindow.html');
     $.get(url, callback, 'html');
 }
-
-function fillInfowindowTemplateWithItem(template, item) {
-    var content = template;
-    content = content.replace('__TITLE__', item.title);
-    content = content.replace('__CATEGORY__', item.category);
-    content = content.replace('__DATE__', item.date);
-    content = content.replace('__LOCATION__', item.location);
-    content = content.replace('__PRICE__', item.price);
-    content = content.replace('__LINKURL__', item.linkUrl);
-    content = content.replace('__PICTUREURL__', item.pictureUrl);
-    if (!item.pictureUrl) {content.replace('__HIDDEN__', 'hidden');}
-    else {content.replace('__HIDDEN__', '');}
-    return content;
-}
-
     
