@@ -2,13 +2,13 @@
     ENTRY POINT
 \*-------------------------*/
 
-function googleMapsApiLoadedCallback() {
-    var map = createMap();
-    
+
+$(document).ready(function() {
+    var map = createMap();    
     receiveItemListFromBackgroundPage(function(itemList) {    
         placeItemListMarkersOnMap(map, itemList);
     });
-}
+});
 
 function createMap() {
     var mapDiv = document.getElementById('lbca_gmap');
@@ -32,7 +32,9 @@ function receiveItemListFromBackgroundPage(callback) {
 function placeItemListMarkersOnMap(map, itemList) {
     var mapMarkers = [];
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
-
+    var oms = new OverlappingMarkerSpiderfier(map);
+    var boundsToFit = new google.maps.LatLngBounds();
+    
     getInfowindowTemplate(function (template) {
         $.each(itemList, function iterateOverNextItem(index, item) {
             var mapMarker = new MapMarker(item);
@@ -40,12 +42,18 @@ function placeItemListMarkersOnMap(map, itemList) {
             
             mapMarker.loadGeocode(function() {   
                 var marker = mapMarker.createGoogleMarker(map, infowindow);
-                marker.addListener('click', function() {
+                boundsToFit.extend(marker.position);
+    
+                oms.addMarker(marker);
+                oms.addListener('click', function(marker, event) {
                     infowindow.setContent(mapMarker.infowindowContent(template));
                     infowindow.open(map, marker);
-                }); //Listener
-            }); //load geocode
-        }); //iterate
+                });
+                
+                if (index == itemList.length - 1) {map.fitBounds(boundsToFit);}
+                
+            }); //load geocode            
+        }); //iterate        
     }); //getInfoWindowTemplate
     
     google.maps.event.addListener(map, "click", function(event) {

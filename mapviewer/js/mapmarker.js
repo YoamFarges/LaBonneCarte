@@ -24,7 +24,7 @@ var MapMarker = function(item) {
     this.googleMarker = null;
     this.backgroundInterface = new BackgroundInterface();
     
-    this.createGoogleMarker = function(map, infowindow, offset = 0) {        
+    this.createGoogleMarker = function(map, infowindow) {        
         if (!this.geocode) {throw new Error("CreateMarker requires an existing geocode");}
 
         var latlng = new google.maps.LatLng(this.geocode.lat, this.geocode.lng);
@@ -38,7 +38,7 @@ var MapMarker = function(item) {
         return marker;
     }
     
-    this.infowindowContent = function(template) {
+    this.infowindowContent = function(template) {        
         var content = template;
         content = content.replace('__TITLE__', item.title);
         content = content.replace('__CATEGORY__', item.category);
