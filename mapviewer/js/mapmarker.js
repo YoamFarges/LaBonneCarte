@@ -24,7 +24,7 @@ var MapMarker = function(item) {
     this.googleMarker = null;
     this.backgroundInterface = new BackgroundInterface();
     
-    this.createGoogleMarker = function(map, infowindow) {        
+    this.createGoogleMarker = function(map) {        
         if (!this.geocode) {throw new Error("CreateMarker requires an existing geocode");}
 
         var latlng = new google.maps.LatLng(this.geocode.lat, this.geocode.lng);
@@ -32,6 +32,7 @@ var MapMarker = function(item) {
             position: latlng,
             map: map,
             animation: google.maps.Animation.DROP,
+            icon: MapMarker.defaultPinIcon(),
         });
         
         this.googleMarker = marker;
@@ -78,10 +79,26 @@ var MapMarker = function(item) {
                 console.log('... will retry in 5 seconds');
                 setTimeout(function() {that.getJSONGeocodeFromGoogleAPI(callback)}, 1200);
                 return;
-            }            
+            }    
             var p = data.results[0].geometry.location;
             var geocode = new Geocode(item.location, p.lat, p.lng);
             callback(geocode);
         });
     }
 }
+
+/*-------------------------*\
+    PIN COLOR
+\*-------------------------*/
+
+MapMarker.pinIcon = function(imageName) {
+    return {
+        url: chrome.extension.getURL('mapviewer/img/' + imageName),
+        size: new google.maps.Size(24, 42),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(12, 42)
+    };
+}
+
+MapMarker.defaultPinIcon = function() {return MapMarker.pinIcon("pinicon_default.png");}
+MapMarker.selectedPinIcon = function() {return MapMarker.pinIcon("pinicon_selected.png");}

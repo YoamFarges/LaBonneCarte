@@ -32,7 +32,7 @@ function receiveItemListFromBackgroundPage(callback) {
 function placeItemListMarkersOnMap(map, itemList) {
     var mapMarkers = [];
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
-    var oms = new OverlappingMarkerSpiderfier(map);
+    var oms = new OverlappingMarkerSpiderfier(map, {keepSpiderfied: true, legWeight:1});
     var boundsToFit = new google.maps.LatLngBounds();
     
     getInfowindowTemplate(function (template) {
@@ -40,26 +40,50 @@ function placeItemListMarkersOnMap(map, itemList) {
             var mapMarker = new MapMarker(item);
             mapMarkers.push(mapMarker);
             
-            mapMarker.loadGeocode(function() {   
-                var marker = mapMarker.createGoogleMarker(map, infowindow);
+            mapMarker.loadGeocode(function() {
+                var marker = mapMarker.createGoogleMarker(map);
+                marker.desc = mapMarker.infowindowContent(template);
                 boundsToFit.extend(marker.position);
-    
                 oms.addMarker(marker);
-                oms.addListener('click', function(marker, event) {
-                    infowindow.setContent(mapMarker.infowindowContent(template));
-                    infowindow.open(map, marker);
-                });
-                
-                if (index == itemList.length - 1) {map.fitBounds(boundsToFit);}
-                
+                if (index == itemList.length - 1) {
+                    map.fitBounds(boundsToFit);
+                }
             }); //load geocode            
         }); //iterate        
     }); //getInfoWindowTemplate
     
+    handleEvents(map, oms, infowindow);
+}
+
+function handleEvents(map, oms, infowindow) {    
     google.maps.event.addListener(map, "click", function(event) {
         infowindow.close();
     });
+    
+    oms.addListener('click', function(marker) {
+        infowindow.close();
+        infowindow.setContent(marker.desc);
+        infowindow.open(map, marker);
+    });
+    
+    oms.addListener('spiderfy', function(markers) {
+        infowindow.close();
+        $.each(markers, function(index, marker){
+           marker.setIcon(MapMarker.selectedPinIcon());
+           if (index == markers.length - 1) {
+               google.maps.event.trigger(marker, 'click');
+           }
+        });
+    });
+    
+    oms.addListener('unspiderfy', function(markers) {
+        infowindow.close();
+        $.each(markers, function(index, marker){
+            marker.setIcon(MapMarker.defaultPinIcon());
+        });
+    });
 }
+
 
 /*-------------------------*\
     INFOWINDOW
