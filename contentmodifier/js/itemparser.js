@@ -36,8 +36,11 @@ function strip(text) {
 }
 
 function fixLink(text) {
-    if (text && text.indexOf('//') == 0) {
-        return 'https:' + text;
+    if (text) {
+        if (text.indexOf('//') == 0) {
+            return 'https:' + text;
+        }
+        return text;
     }
     return null;
 }
