@@ -4,19 +4,19 @@
   "name": "La Bonne Carte",
   "short_name": "LaBonneCarte",
   "description": "Cette extension vous permet d'afficher les résultats d'une recherche leboncoin directement sur une carte Google.",
-  "version": "0.1.1",
+  "version": "0.2.1",
 
-  "icons" : { 
+  "icons" : {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    
+
     "permissions": [
         "https://maps.google.com/*",
         "https://maps.googleapis.com/*"
     ],
-    
+
     "content_security_policy": "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://maps-api-ssl.google.com ; object-src 'self'",
 
     "web_accessible_resources": [
@@ -24,14 +24,14 @@
         "mapviewer/*",
         "contentmodifier/html/*"
     ],
-    
+
     "background": {
         "scripts": [
         "shared/lib/jquery-2.2.3.min.js",
         "shared/models/geocode.js",
         "background/background.js"
     ]},
-    
+
     "content_scripts" : [{
         "matches" : ["*://*.leboncoin.fr/*"],
         "js" : [
@@ -42,5 +42,5 @@
         ],
         "css" : [ "contentmodifier/css/contentmodifier.css"]
     }]
-    
+
 }
