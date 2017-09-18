@@ -1,8 +1,9 @@
 /*
-    Quick helper method to gather the data of the leboncoin's page and store it under the form of
-    an Item object.
-    
-    Not stable as if the page layout or the class names change we need to change this function.
+    Method to gather the data of the leboncoin's page and store it under the form of
+    an array of Item objects.
+
+    Warning:
+    If the page's layout or the class names change this method will need to be updated.
 */
 Item.getItemListFromPage = function () {
     var array = [];
@@ -42,5 +43,6 @@ function fixLink(text) {
         }
         return text;
     }
-    return null;
+
+    return chrome.extension.getURL('mapviewer/img/no_image.jpg');
 }
