@@ -4,7 +4,7 @@
   "name": "La Bonne Carte",
   "short_name": "LaBonneCarte",
   "description": "Cette extension vous permet d'afficher les résultats d'une recherche leboncoin directement sur une carte Google.",
-  "version": "0.2.1",
+  "version": "0.2.2",
 
   "icons" : {
       "16": "icons/icon16.png",
