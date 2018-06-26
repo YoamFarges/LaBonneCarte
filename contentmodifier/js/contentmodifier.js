@@ -9,7 +9,9 @@ $(document).ready(function() {
     var itemList = Item.getItemListFromPage();
     if (!itemList.length) {return;}
     var titleNode = getPageTitleNode();
-    if (!titleNode) {return;}
+    if (!titleNode) {
+        console.log("The page title has not been found. Extension Labonnecarte won't be displayed.")
+        return;}
     var url = chrome.extension.getURL('contentmodifier/html/injectedcontent.html');
 
    //Send the item list to the background page
@@ -17,7 +19,7 @@ $(document).ready(function() {
 
     //Get the map hidden status from the background page
     chrome.extension.sendMessage({method: 'getMapHidden'}, getMapHiddenCallback);
-    function getMapHiddenCallback(response) {        
+    function getMapHiddenCallback(response) {
          //Load the html file to inject in the page
          $.get(url, function(content) {injectedContentReceived(content, titleNode, response.mapHidden)}, 'html');
     }
@@ -32,20 +34,21 @@ function injectedContentReceived(injectedContent, nodeToInjectAfter, mapIsHidden
     var hideContainer = $('#lbca_hide_container');
     var button = $('#lbca_button');
     updateButtonText(button, mapIsHidden);
-    
+
     //Clone the pagination just below the map
     var footer = getFooterPagination();
+    footer.css("margin-top", "1em");
     if (footer) {hideContainer.append(footer.clone());}
-    
+
     if (mapIsHidden) {
         hideContainer.hide();
     } else {
         loadIframeIfNecessary();
     }
-        
+
     button.click(function onButtonClick() {
-        loadIframeIfNecessary(); 
-               
+        loadIframeIfNecessary();
+
         hideContainer.slideToggle(100, function() {
             var hidden = hideContainer.is(":hidden");
             saveMapHiddenState(hidden);
@@ -83,12 +86,11 @@ function saveMapHiddenState(hidden) {
     Returns: title node object if found. Null otherwise.
 */
 function getPageTitleNode() {
-     var titleNode = $('#main > section:first').children('h1').first();
-     return titleNode.length ? titleNode : null;
+     var titleNode = document.querySelector(".bgMain").querySelector("h1");
+     return titleNode;
 }
 
 function getFooterPagination() {
-    var pagination = $("footer.pagination");
-    return pagination.length ? pagination : null;
+    var pagination = $(".googleafs").next();
+    return pagination;
 }
-
