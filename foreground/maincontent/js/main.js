@@ -3,6 +3,9 @@
 \*-------------------------*/
 var iframeIsInitiallyHidden = false;
 
+var parser = new WebpageParser();
+var background = new BackgroundInterface();
+
 $(document).ready(function() {
     //Guard
     //if wrong page or if page layout have changed, we abort.
@@ -12,10 +15,10 @@ $(document).ready(function() {
     if (!titleNode) {
         console.log("The page title has not been found. Extension Labonnecarte won't be displayed.")
         return;}
-    var url = chrome.extension.getURL('contentmodifier/html/injectedcontent.html');
+    var url = chrome.extension.getURL('maincontent/html/injectedcontent.html');
 
    //Send the item list to the background page
-    sendItemsToBackgroundPage(itemList);
+   background.updateItems(itemList);
 
     //Get the map hidden status from the background page
     chrome.extension.sendMessage({method: 'getMapHidden'}, getMapHiddenCallback);
@@ -65,7 +68,6 @@ function loadIframeIfNecessary() {
 }
 
 function sendItemsToBackgroundPage(itemList) {
-    chrome.extension.sendMessage({method: 'setItemList', itemList: itemList});
 }
 
 function updateButtonText(button, hidden) {
@@ -74,23 +76,4 @@ function updateButtonText(button, hidden) {
 
 function saveMapHiddenState(hidden) {
     chrome.extension.sendMessage({method: 'setMapHidden', mapHidden:hidden});
-}
-
-/*-------------------------*\
-    PARSE THE CURRENT PAGE
-\*-------------------------*/
-
-/*
-    Parse the page content to get the title of the page. Useful as we want to
-    position our iframe under it.
-    Returns: title node object if found. Null otherwise.
-*/
-function getPageTitleNode() {
-     var titleNode = document.querySelector(".bgMain").querySelector("h1");
-     return titleNode;
-}
-
-function getFooterPagination() {
-    var pagination = $(".googleafs").next();
-    return pagination;
 }

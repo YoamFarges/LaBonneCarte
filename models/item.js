@@ -1,4 +1,5 @@
-var Item = function() {
+class Item {
+  constructor() {
     this.title = 'undefined';
     this.price = '0 €';
     this.category = '';
@@ -6,4 +7,5 @@ var Item = function() {
     this.location = '';
     this.pictureUrl = '';
     this.linkUrl = '';
+  }
 }
