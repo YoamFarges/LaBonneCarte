@@ -20,16 +20,16 @@
     "content_security_policy": "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://maps-api-ssl.google.com ; object-src 'self'",
 
     "web_accessible_resources": [
-        "shared/*",
-        "mapviewer/*",
-        "contentmodifier/html/*"
+        "lib/*",
+        "foreground/mapviewer/*",
+        "foreground/mapcontainer/html/*"
     ],
 
     "background": {
         "scripts": [
         "lib/jquery-2.2.3.min.js",
 
-        "shared/models/geocode.js",
+        "models/geocode.js",
 
         "interface/enums/message_keys.js",
         "interface/content_interface.js",
@@ -47,10 +47,14 @@
             "interface/enums/message_keys.js",
             "interface/background_interface.js",
 
-            "contentmodifier/js/itemparser.js",
-            "contentmodifier/js/contentmodifier.js"
+            "foreground/maincontent/js/webpageparser.js",
+            "foreground/mapcontainer/js/mapcontainermanager.js",
+
+            "foreground/maincontent/js/main.js"
         ],
-        "css" : [ "contentmodifier/css/contentmodifier.css"]
+        "css" : [
+            "foreground/mapcontainer/css/mapcontainer.css"
+        ]
     }]
 
 }

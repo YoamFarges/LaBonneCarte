@@ -1,9 +1,8 @@
 var MessageKeys = {
-    "UPDATE_ITEMS"      : "updateItems",
-
-    "IS_MAP_HIDDEN"     : "isMapHidden",
-    "SET_IS_MAP_HIDDEN" : "setIsMapHidden",
-
-    
+    "UPDATE_ITEMS"                  : "updateItems",
+    "GET_ITEMS"                     : "getItems",
+    "IS_MAP_HIDDEN"                 : "isMapHidden",
+    "SET_IS_MAP_HIDDEN"             : "setIsMapHidden",
 }
+
 Object.freeze(MessageKeys)

@@ -1,52 +1,76 @@
-class MapContainerManager() {
-    constructor(isMapInitiallyHidden) {
-        this.isMapInitiallyHidden = isMapInitiallyHidden;
-        this.viewURL = chrome.extension.getURL('maincontent/html/injectedcontent.html');
+class MapContainerManager {
+    constructor(backgroundInterface, webpageParser) {
+        this.webpageParser = webpageParser;
+        this.backgroundInterface = backgroundInterface;
+
+        this.mapViewerURL = chrome.extension.getURL('foreground/mapviewer/html/mapviewer.html');
     }
 
-    function injectContainerBelowNode(node) {
+    injectContainerHTMLContent(htmlContent) {
+        let self = this;
 
-    }
-
-    function cloneFooterPagination(footerPagination) {
-        if (!footerPagination) {
-            console.log("Impossible to clone pagination footer. Object was not found.");
+        var titleNode = self.webpageParser.getPageTitleNode();
+        if (!titleNode) {
+            console.log("The page title has not been found. Extension Labonnecarte won't be displayed.")
             return;
         }
-    }
 
-    function injectedContentReceived(injectedContent, nodeToInjectAfter, mapIsHidden) {
-        $(injectedContent).insertAfter(nodeToInjectAfter);
-        var hideContainer = $('#lbca_hide_container');
-        var button = $('#lbca_button');
-        updateButtonText(button, mapIsHidden);
+        $(htmlContent).insertAfter(titleNode);
+        self.hideContainer = $('#lbca_hide_container');
+        self.button = $('#lbca_button');
 
-        //Clone the pagination just below the map
-        var footer = getFooterPagination();
-        footer.css("margin-top", "1em");
-        if (footer) {hideContainer.append(footer.clone());}
+        setupInitialHiddenState();
+        setupButton();
+        setupFooterPagination();
 
-        if (mapIsHidden) {
-            hideContainer.hide();
-        } else {
-            loadIframeIfNecessary();
+        console.log("Did successfully inject container");
+
+        // Private methods
+
+        function setupInitialHiddenState() {
+            if (self.backgroundInterface.isMapHidden) {
+                self.hideContainer.hide();
+            } else {
+                loadMapViewerIframeIfNeeded();
+            }
         }
 
-        button.click(function onButtonClick() {
-            loadIframeIfNecessary();
+        function setupButton() {
+            updateButtonText();
+            self.button.click(function onButtonClick() {
+                loadMapViewerIframeIfNeeded();
+                let hideContainer = self.hideContainer;
 
-            hideContainer.slideToggle(100, function() {
-                var hidden = hideContainer.is(":hidden");
-                saveMapHiddenState(hidden);
-                updateButtonText(button, hidden);
+                hideContainer.slideToggle(100, function() {
+                    var isHidden = hideContainer.is(":hidden");
+                    self.backgroundInterface.isMapHidden = isHidden;
+
+                    updateButtonText();
+                });
             });
-        });
-    }
 
-    function loadIframeIfNecessary() {
-        var mapIframe = $('#lbca_iframe');
-        if (mapIframe.attr('src') === undefined) {
-            mapIframe.attr('src', chrome.extension.getURL('mapviewer/html/mapviewer.html'));
+            function updateButtonText() {
+                var isHidden = self.backgroundInterface.isMapHidden;
+                self.button.html(isHidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
+            }
+        }
+
+        function loadMapViewerIframeIfNeeded() {
+            var mapIframe = $('#lbca_iframe');
+            if (mapIframe.attr('src') === undefined) {
+                mapIframe.attr('src', self.mapViewerURL);
+            }
+        }
+
+        function setupFooterPagination() {
+            var footerPagination = self.webpageParser.getFooterPagination();
+            if (!footerPagination) {
+                console.log("Impossible to clone pagination footer. Object was not found.");
+                return;
+            }
+
+            footerPagination.css("margin-top", "1em");
+            self.hideContainer.append(footerPagination.clone());
         }
     }
 }

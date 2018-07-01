@@ -4,8 +4,10 @@
 
 
 $(document).ready(function() {
-    var map = createMap();    
-    receiveItemListFromBackgroundPage(function(itemList) {    
+    var map = createMap();
+    receiveItemListFromBackgroundPage(function(itemList) {
+        console.log(itemList.length + "items were retrieved from background thread");
+
         placeItemListMarkersOnMap(map, itemList);
     });
 });
@@ -20,8 +22,8 @@ function createMap() {
 }
 
 function receiveItemListFromBackgroundPage(callback) {
-    chrome.extension.sendMessage({method: 'getItemList'}, function(response){
-        callback(response.itemList);
+    chrome.extension.sendMessage({method: MessageKeys.GET_ITEMS}, function(response){
+        callback(response.items);
     });
 }
 
@@ -34,12 +36,12 @@ function placeItemListMarkersOnMap(map, itemList) {
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
     var oms = new OverlappingMarkerSpiderfier(map, {keepSpiderfied: true, legWeight:1});
     var boundsToFit = new google.maps.LatLngBounds();
-    
+
     getInfowindowTemplate(function (template) {
         $.each(itemList, function iterateOverNextItem(index, item) {
             var mapMarker = new MapMarker(item);
             mapMarkers.push(mapMarker);
-            
+
             mapMarker.loadGeocode(function() {
                 var marker = mapMarker.createGoogleMarker(map);
                 marker.desc = mapMarker.infowindowContent(template);
@@ -48,24 +50,24 @@ function placeItemListMarkersOnMap(map, itemList) {
                 if (index == itemList.length - 1) {
                     map.fitBounds(boundsToFit);
                 }
-            }); //load geocode            
-        }); //iterate        
+            }); //load geocode
+        }); //iterate
     }); //getInfoWindowTemplate
-    
+
     handleEvents(map, oms, infowindow);
 }
 
-function handleEvents(map, oms, infowindow) {    
+function handleEvents(map, oms, infowindow) {
     google.maps.event.addListener(map, "click", function(event) {
         infowindow.close();
     });
-    
+
     oms.addListener('click', function(marker) {
         infowindow.close();
         infowindow.setContent(marker.desc);
         infowindow.open(map, marker);
     });
-    
+
     oms.addListener('spiderfy', function(markers) {
         infowindow.close();
         $.each(markers, function(index, marker){
@@ -75,7 +77,7 @@ function handleEvents(map, oms, infowindow) {
            }
         });
     });
-    
+
     oms.addListener('unspiderfy', function(markers) {
         infowindow.close();
         $.each(markers, function(index, marker){
@@ -90,7 +92,6 @@ function handleEvents(map, oms, infowindow) {
 \*-------------------------*/
 
 function getInfowindowTemplate(callback) {
-    var url = chrome.extension.getURL('mapviewer/html/infowindow.html');
+    var url = chrome.extension.getURL('foreground/mapviewer/html/infowindow.html');
     $.get(url, callback, 'html');
 }
-    

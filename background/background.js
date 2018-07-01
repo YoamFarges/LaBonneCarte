@@ -6,19 +6,26 @@
 
     Mandatory: request.method, as the name of the 'method' to call.
 */
-var mapHidden = true;
-var itemList = null;
+var isMapHidden = true;
+var items = null;
 var cachedGeocodeList = [];
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-     if (request.method == "setMapHidden") {
-        mapHidden = request.mapHidden;
-    } else if (request.method == MessageKeys.IS_MAP_HIDDEN) {
+    if (request.method == MessageKeys.SET_IS_MAP_HIDDEN) {
+        isMapHidden = request.isMapHidden;
+    }
+    else if (request.method == MessageKeys.IS_MAP_HIDDEN) {
         sendResponse({isMapHidden: isMapHidden});
-    } else if (request.method == "setItemList" && request.itemList) {
-        itemList = request.itemList;
-    } else if (request.method == "getItemList") {
-        sendResponse({itemList: itemList});
-    } else if (request.method == "searchGeocode") {
+    }
+
+    else if (request.method == MessageKeys.UPDATE_ITEMS && request.items) {
+        items = request.items;
+    }
+
+    else if (request.method == MessageKeys.GET_ITEMS) {
+        sendResponse({items: items});
+    }
+
+    else if (request.method == "searchGeocode") {
         var geocode = getCachedGeocodeWithLocation(request.location);
         if (geocode) {
             sendResponse(geocode.serialized());
@@ -35,6 +42,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         //Otherwise the background thread shuts down and the callback is never called.
         return true;
     }
+
+    return false;
 });
 
 //Utils
