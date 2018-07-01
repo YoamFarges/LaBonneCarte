@@ -5,9 +5,7 @@
     </head>
 
     <body>
-        <div id="lbca_container">
-            <div id="lbca_gmap"></div>
-        </div>
+        <div id="lbca_map"></div>
 
         <script type="text/javascript" src="../../../lib/jquery-2.2.3.min.js"></script>
         <script type="text/javascript" src="../../../models/item.js"></script>
@@ -15,10 +13,11 @@
 
         <script type="text/javascript" src="../../../interface/enums/message_keys.js"></script>
 
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
+        <script type="text/javascript" src='https://api.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.46.0/mapbox-gl.css' rel='stylesheet' />
+
         <script type="text/javascript" src="../js/oms.min.js"></script>
         <script type="text/javascript" src="../js/mapmarker.js"></script>
         <script type="text/javascript" src="../js/mapviewer.js"></script>
-
     </body>
 </html>

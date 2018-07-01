@@ -2,23 +2,31 @@
     ENTRY POINT
 \*-------------------------*/
 
-
 $(document).ready(function() {
     var map = createMap();
     receiveItemListFromBackgroundPage(function(itemList) {
         console.log(itemList.length + "items were retrieved from background thread");
 
-        placeItemListMarkersOnMap(map, itemList);
+        //placeItemListMarkersOnMap(map, itemList);
     });
 });
 
 function createMap() {
-    var mapDiv = document.getElementById('lbca_gmap');
-    var gmap = new google.maps.Map(mapDiv, {
-        center: {lat: 46.8052899, lng: 2.379206},
-        zoom: 5
+    mapboxgl.accessToken = 'pk.eyJ1IjoieW9hbWZhcmdlcyIsImEiOiJjaml5aXIyMWkwYXpzM3FsZWQwODY5enF4In0.Xx-HaojIyreexKZds7vsuA';
+    var map = new mapboxgl.Map({
+        container: 'lbca_map',
+        style: 'mapbox://styles/mapbox/streets-v10',
+        center: [2.6025, 46.34],
+        zoom: 4
     });
-    return gmap;
+
+    var navigationControl = new mapboxgl.NavigationControl({
+        showCompass: false,
+        showZoom: true,
+    });
+    map.addControl(navigationControl);
+
+    return map;
 }
 
 function receiveItemListFromBackgroundPage(callback) {

@@ -6,9 +6,10 @@
 
     Mandatory: request.method, as the name of the 'method' to call.
 */
-var isMapHidden = true;
+var isMapHidden = false;
 var items = null;
 var cachedGeocodeList = [];
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.method == MessageKeys.SET_IS_MAP_HIDDEN) {
         isMapHidden = request.isMapHidden;

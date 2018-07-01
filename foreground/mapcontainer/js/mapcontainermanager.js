@@ -16,6 +16,7 @@ class MapContainerManager {
         }
 
         $(htmlContent).insertAfter(titleNode);
+
         self.hideContainer = $('#lbca_hide_container');
         self.button = $('#lbca_button');
 

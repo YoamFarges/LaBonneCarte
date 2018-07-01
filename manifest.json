@@ -13,11 +13,10 @@
     },
 
     "permissions": [
-        "https://maps.google.com/*",
-        "https://maps.googleapis.com/*"
+        "https://api.mapbox.com/*"
     ],
 
-    "content_security_policy": "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://maps-api-ssl.google.com ; object-src 'self'",
+    "content_security_policy": "script-src 'self' https://api.mapbox.com ; object-src 'self'",
 
     "web_accessible_resources": [
         "lib/*",
