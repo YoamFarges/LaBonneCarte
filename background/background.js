@@ -3,40 +3,42 @@
     the google maps iframe in order to display the markers correctly.
 
     It also caches the geocache data as the number of Google API call is limited.
-
-    Mandatory: request.method, as the name of the 'method' to call.
 */
 var isMapHidden = false;
-var items = null;
-var cachedGeocodeList = [];
+var geocodeCache = new GeocodeCache();
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.method == MessageKeys.SET_IS_MAP_HIDDEN) {
-        isMapHidden = request.isMapHidden;
-    }
-    else if (request.method == MessageKeys.IS_MAP_HIDDEN) {
-        sendResponse({isMapHidden: isMapHidden});
+chrome.runtime.onMessage.addListener(function(requestDTO, sender, sendResponse) {
+    if (requestDTO.method == MethodKeys.SET_IS_MAP_HIDDEN) {
+        let mapHiddenDTO = requestDTO.innerDTO;
+        isMapHidden = mapHiddenDTO.isMapHidden;
+        dispatch(new RequestDTO(MethodKeys.DID_SET_IS_MAP_HIDDEN, mapHiddenDTO));
     }
 
-    else if (request.method == MessageKeys.UPDATE_ITEMS && request.items) {
-        items = request.items;
+    else if (requestDTO.method == MethodKeys.IS_MAP_HIDDEN) {
+        let dto = new MapHiddenDTO(this.isMapHidden);
+        sendResponse(dto);
     }
 
-    else if (request.method == MessageKeys.GET_ITEMS) {
-        sendResponse({items: items});
+    else if (requestDTO.method == MethodKeys.UPDATE_ITEMS) {
+        let itemsDTO = requestDTO.innerDTO;
+        dispatch(new RequestDTO(MethodKeys.DID_UPDATE_ITEMS, itemsDTO));
     }
 
-    else if (request.method == "searchGeocode") {
-        var geocode = getCachedGeocodeWithLocation(request.location);
-        if (geocode) {
-            sendResponse(geocode.serialized());
-        } else {
-            sendResponse(null);
-        }
-    } else if (request.method == "insertGeocode") {
-        var geocode = Geocode.withJson(request.geocode);
-        cachedGeocodeList.push(geocode);
-    } else if (request.method == "getJSON") {
+    else if (requestDTO.method == MethodKeys.GET_CACHED_GEOCODE) {
+        let getCachedGeocodeDTO = requestDTO.innerDTO;
+        let location = getCachedGeocodeDTO.location;
+        let geocode = this.geocodeCache.geocodeWithLocation(location);
+        let responseDTO = new GetCachedGeocodeResponseDTO(geocode);
+        sendResponse(responseDTO);
+    }
+
+    else if (requestDTO.method == MethodKeys.SET_CACHED_GEOCODE) {
+        let setCachedGeocodeDTO = requestDTO.innerDTO;
+        let geocode = setCachedGeocode.geocode;
+        this.geocodeCache.cacheGeocode(geocode);
+    }
+
+    else if (requestDTO.method == MethodKeys.GET_JSON) {
         $.getJSON(request.url, sendResponse);
 
         //We have to return true for asynchronous purposes.
@@ -46,6 +48,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
     return false;
 });
+
+// Redispatch a request to all content scripts listeners
+function dispatch(requestDTO) {
+    chrome.runtime.sendMessage(requestDTO, null);
+}
 
 //Utils
 function getCachedGeocodeWithLocation(location) {

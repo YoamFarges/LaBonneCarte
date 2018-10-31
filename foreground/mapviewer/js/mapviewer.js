@@ -7,7 +7,7 @@ $(document).ready(function() {
     receiveItemListFromBackgroundPage(function(itemList) {
         console.log(itemList.length + "items were retrieved from background thread");
 
-        //placeItemListMarkersOnMap(map, itemList);
+        placeItemListMarkersOnMap(map, itemList);
     });
 });
 
@@ -30,7 +30,7 @@ function createMap() {
 }
 
 function receiveItemListFromBackgroundPage(callback) {
-    chrome.extension.sendMessage({method: MessageKeys.GET_ITEMS}, function(response){
+    chrome.extension.sendMessage({method: MethodKeys.GET_ITEMS}, function(response){
         callback(response.items);
     });
 }
@@ -40,6 +40,8 @@ function receiveItemListFromBackgroundPage(callback) {
 \*-------------------------*/
 
 function placeItemListMarkersOnMap(map, itemList) {
+    return;
+    
     var mapMarkers = [];
     var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
     var oms = new OverlappingMarkerSpiderfier(map, {keepSpiderfied: true, legWeight:1});

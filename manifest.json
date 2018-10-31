@@ -33,6 +33,7 @@
         "interface/enums/message_keys.js",
         "interface/content_interface.js",
 
+        "background/geocodecache.js"
         "background/background.js"
     ]},
 

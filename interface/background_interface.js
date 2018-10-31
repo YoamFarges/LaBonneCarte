@@ -8,12 +8,13 @@ class BackgroundInterface {
 
     synchronizeWithBackground() {
         var isMapHiddenPromise = new Promise(function(resolve, reject) {
-            chrome.extension.sendMessage({method: MessageKeys.IS_MAP_HIDDEN}, callback);
-            var that = this;
-            function callback(response) {
-                that.mIsMapHidden = response.isMapHidden;
+            let requestDTO = new RequestDTO(MethodKeys.GET_IS_MAP_HIDDEN);
+
+            var self = this;
+            chrome.extension.sendMessage(requestDTO, function callback(mapHiddenDTO) {
+                that.mIsMapHidden = mapHiddenDTO.isMapHidden;
                 resolve();
-            }
+            });
         }.bind(this));
 
         return Promise.all([isMapHiddenPromise]);
@@ -24,18 +25,16 @@ class BackgroundInterface {
     }
 
     set isMapHidden(newValue) {
-        chrome.extension.sendMessage({
-            method: MessageKeys.SET_IS_MAP_HIDDEN,
-            isMapHidden : newValue
-        });
-
         this.mIsMapHidden = newValue;
+
+        let mapHiddenDTO = new MapHiddenDTO(newValue);
+        let requestDTO = new RequestDTO(MethodKeys.SET_IS_MAP_HIDDEN, mapHiddenDTO);
+        chrome.extension.sendMessage(requestDTO);
     }
 
     updateItems(items) {
-        chrome.extension.sendMessage({
-            method: MessageKeys.UPDATE_ITEMS,
-            items: items
-        });
+        let itemsDTO = new ItemsDTO(items);
+        let requestDTO = new RequestDTO(MethodKeys.SET_ITEMS, itemsDTO);
+        chrome.extension.sendMessage(requestDTO);
     }
 }

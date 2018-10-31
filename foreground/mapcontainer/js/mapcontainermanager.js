@@ -2,7 +2,6 @@ class MapContainerManager {
     constructor(backgroundInterface, webpageParser) {
         this.webpageParser = webpageParser;
         this.backgroundInterface = backgroundInterface;
-
         this.mapViewerURL = chrome.extension.getURL('foreground/mapviewer/html/mapviewer.html');
     }
 
