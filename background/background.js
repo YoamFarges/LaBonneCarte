@@ -4,17 +4,17 @@
 
     It also caches the geocache data as the number of Google API call is limited.
 */
-var isMapHidden = false;
 var geocodeCache = new GeocodeCache();
+var isMapHidden = false;
 
 chrome.runtime.onMessage.addListener(function(requestDTO, sender, sendResponse) {
     if (requestDTO.method == MethodKeys.SET_IS_MAP_HIDDEN) {
         let mapHiddenDTO = requestDTO.innerDTO;
         isMapHidden = mapHiddenDTO.isMapHidden;
-        dispatch(new RequestDTO(MethodKeys.DID_SET_IS_MAP_HIDDEN, mapHiddenDTO));
+        sendResponse(mapHiddenDTO);
     }
 
-    else if (requestDTO.method == MethodKeys.IS_MAP_HIDDEN) {
+    else if (requestDTO.method == MethodKeys.GET_IS_MAP_HIDDEN) {
         let dto = new MapHiddenDTO(this.isMapHidden);
         sendResponse(dto);
     }
@@ -22,6 +22,7 @@ chrome.runtime.onMessage.addListener(function(requestDTO, sender, sendResponse) 
     else if (requestDTO.method == MethodKeys.UPDATE_ITEMS) {
         let itemsDTO = requestDTO.innerDTO;
         dispatch(new RequestDTO(MethodKeys.DID_UPDATE_ITEMS, itemsDTO));
+        sendResponse(itemsDTO);
     }
 
     else if (requestDTO.method == MethodKeys.GET_CACHED_GEOCODE) {
@@ -52,16 +53,4 @@ chrome.runtime.onMessage.addListener(function(requestDTO, sender, sendResponse) 
 // Redispatch a request to all content scripts listeners
 function dispatch(requestDTO) {
     chrome.runtime.sendMessage(requestDTO, null);
-}
-
-//Utils
-function getCachedGeocodeWithLocation(location) {
-    var geocode = null;
-    $.each(cachedGeocodeList, function(index, item) {
-        if (item.location == location) {
-            geocode = item;
-            return false; //break;
-        }
-    });
-    return geocode;
 }

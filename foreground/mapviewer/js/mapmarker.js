@@ -72,11 +72,11 @@ var MapMarker = function(item) {
         var url = 'http://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=' + item.location;
         this.backgroundInterface.getJsonFromExternalUrl(url, function(data) {
             if (data.status != 'OK') {
-                console.log('Geocode overload or service down.');
-                console.log(data);
+                logError('Geocode overload or service down.');
+                logError(data);
 
                 //Retry in 5s
-                console.log('... will retry in 5 seconds');
+                log('... will retry in 5 seconds');
                 setTimeout(function() {that.getJSONGeocodeFromGoogleAPI(callback)}, 1200);
                 return;
             }

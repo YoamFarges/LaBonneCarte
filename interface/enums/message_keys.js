@@ -4,14 +4,12 @@ var MethodKeys = {
 
     "GET_IS_MAP_HIDDEN"             : "getIsMapHidden",
     "SET_IS_MAP_HIDDEN"             : "setIsMapHidden",
-    "DID_SET_IS_MAP_HIDDEN"         : "didSetIsMapHidden",
 
     "GET_CACHED_GEOCODE"            : "getCachedGeocode",
     "SET_CACHED_GEOCODE"            : "setCachedGeocode",
 
     "GET_JSON"                      : "getJSON",
 }
-Object.freeze(MessageKeys)
 
 class RequestDTO {
     constructor(method, innerDTO = null) {

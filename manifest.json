@@ -28,12 +28,14 @@
         "scripts": [
         "lib/jquery-2.2.3.min.js",
 
+        "utils/logger.js",
+
         "models/geocode.js",
 
         "interface/enums/message_keys.js",
         "interface/content_interface.js",
 
-        "background/geocodecache.js"
+        "background/geocodecache.js",
         "background/background.js"
     ]},
 
@@ -41,6 +43,8 @@
         "matches" : ["*://*.leboncoin.fr/*"],
         "js" : [
             "lib/jquery-2.2.3.min.js",
+
+            "utils/logger.js",
 
             "models/item.js",
 

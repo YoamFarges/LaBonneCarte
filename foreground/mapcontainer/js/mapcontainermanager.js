@@ -2,75 +2,91 @@ class MapContainerManager {
     constructor(backgroundInterface, webpageParser) {
         this.webpageParser = webpageParser;
         this.backgroundInterface = backgroundInterface;
+        this.containerURL = chrome.extension.getURL('foreground/mapcontainer/html/mapcontainer.html');
         this.mapViewerURL = chrome.extension.getURL('foreground/mapviewer/html/mapviewer.html');
     }
 
-    injectContainerHTMLContent(htmlContent) {
-        let self = this;
+    init() {
+        const self = this;
 
+        //Retrieve title
         var titleNode = self.webpageParser.getPageTitleNode();
         if (!titleNode) {
-            console.log("The page title has not been found. Extension Labonnecarte won't be displayed.")
+            logError("The page title has not been found. Extension Labonnecarte won't be displayed.")
             return;
         }
+        
+        //Read HTML file of the map container
+        getHTMLContent(self.containerURL)
+        .then(content => {
+            //Load the map container below the title
+            $(content).insertAfter(titleNode);
 
-        $(htmlContent).insertAfter(titleNode);
+            //Store DOM references for future usage
+            self.iFrameContainer = $('#lbca_iframe_container');
+            self.button = $('#lbca_button');
 
-        self.hideContainer = $('#lbca_hide_container');
-        self.button = $('#lbca_button');
+            //Finish setup
+            setupButtonClick();
+            setupFooterPagination();
+            setupInitialHiddenState();
 
-        setupInitialHiddenState();
-        setupButton();
-        setupFooterPagination();
+            log("Did successfully load map container");
+        })
 
-        console.log("Did successfully inject container");
-
+        //
         // Private methods
+        //
 
-        function setupInitialHiddenState() {
-            if (self.backgroundInterface.isMapHidden) {
-                self.hideContainer.hide();
-            } else {
-                loadMapViewerIframeIfNeeded();
-            }
+        function setupInitialHiddenState(isMapHidden) {
+            self.backgroundInterface.isMapHidden().then(isMapHidden => {
+                self.updateButtonText(isMapHidden);
+
+                isMapHidden 
+                ? self.iFrameContainer.hide()
+                : self.loadMapViewerIframeIfNeeded();
+            });
         }
 
-        function setupButton() {
-            updateButtonText();
+        function setupButtonClick() {
             self.button.click(function onButtonClick() {
-                loadMapViewerIframeIfNeeded();
-                let hideContainer = self.hideContainer;
+                self.loadMapViewerIframeIfNeeded();
+                let iFrameContainer = self.iFrameContainer;
 
-                hideContainer.slideToggle(100, function() {
-                    var isHidden = hideContainer.is(":hidden");
-                    self.backgroundInterface.isMapHidden = isHidden;
-
-                    updateButtonText();
+                iFrameContainer.slideToggle(100, function() {
+                    var isHidden = iFrameContainer.is(":hidden");
+                    self.backgroundInterface.setIsMapHidden(isHidden);
+                    self.updateButtonText(isHidden);
                 });
             });
-
-            function updateButtonText() {
-                var isHidden = self.backgroundInterface.isMapHidden;
-                self.button.html(isHidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
-            }
-        }
-
-        function loadMapViewerIframeIfNeeded() {
-            var mapIframe = $('#lbca_iframe');
-            if (mapIframe.attr('src') === undefined) {
-                mapIframe.attr('src', self.mapViewerURL);
-            }
         }
 
         function setupFooterPagination() {
             var footerPagination = self.webpageParser.getFooterPagination();
             if (!footerPagination) {
-                console.log("Impossible to clone pagination footer. Object was not found.");
+                logError("Impossible to clone pagination footer. Object was not found.");
                 return;
             }
 
             footerPagination.css("margin-top", "1em");
-            self.hideContainer.append(footerPagination.clone());
+            self.iFrameContainer.append(footerPagination.clone());
         }
+
+        function  getHTMLContent(url) {
+           return new Promise(function (resolve, reject) {
+               $.get(url, content => resolve(content), 'html');
+            });
+        }
+    }
+
+    loadMapViewerIframeIfNeeded() {
+        var mapIframe = $('#lbca_iframe');
+        if (mapIframe.attr('src') === undefined) {
+            mapIframe.attr('src', this.mapViewerURL);
+        }
+    }
+
+    updateButtonText(isMapHidden) {
+        this.button.html(isMapHidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
     }
 }

@@ -2,39 +2,34 @@
 Proxy class to simplify the communication TO the background.js
 */
 class BackgroundInterface {
-    constructor() {
-        this.mIsMapHidden = null;
-    }
+    constructor() { }
 
-    synchronizeWithBackground() {
-        var isMapHiddenPromise = new Promise(function(resolve, reject) {
+    isMapHidden() {
+        return new Promise(function (resolve, reject) {
             let requestDTO = new RequestDTO(MethodKeys.GET_IS_MAP_HIDDEN);
-
-            var self = this;
             chrome.extension.sendMessage(requestDTO, function callback(mapHiddenDTO) {
-                that.mIsMapHidden = mapHiddenDTO.isMapHidden;
-                resolve();
+                resolve(mapHiddenDTO.isMapHidden);
             });
-        }.bind(this));
-
-        return Promise.all([isMapHiddenPromise]);
+        });
     }
 
-    get isMapHidden() {
-        return this.mIsMapHidden;
+    setIsMapHidden(newValue) {
+        return new Promise(function (resolve, reject) {
+            let mapHiddenDTO = new MapHiddenDTO(newValue);
+            let requestDTO = new RequestDTO(MethodKeys.SET_IS_MAP_HIDDEN, mapHiddenDTO);
+            chrome.extension.sendMessage(requestDTO, function callback(mapHiddenDTO) {
+                resolve(mapHiddenDTO.isMapHidden);
+            });
+        });
     }
 
-    set isMapHidden(newValue) {
-        this.mIsMapHidden = newValue;
-
-        let mapHiddenDTO = new MapHiddenDTO(newValue);
-        let requestDTO = new RequestDTO(MethodKeys.SET_IS_MAP_HIDDEN, mapHiddenDTO);
-        chrome.extension.sendMessage(requestDTO);
-    }
-
-    updateItems(items) {
-        let itemsDTO = new ItemsDTO(items);
-        let requestDTO = new RequestDTO(MethodKeys.SET_ITEMS, itemsDTO);
-        chrome.extension.sendMessage(requestDTO);
+    setItems(items) {
+        return new Promise(function (resolve, reject) {
+            let itemsDTO = new ItemsDTO(items);
+            let requestDTO = new RequestDTO(MethodKeys.SET_ITEMS, itemsDTO);
+            chrome.extension.sendMessage(requestDTO, function callback(requestDTO) {
+                resolve(requestDTO.innerDTO);
+            });
+        });
     }
 }

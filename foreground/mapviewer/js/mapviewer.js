@@ -3,10 +3,11 @@
 \*-------------------------*/
 
 $(document).ready(function() {
+    log("Mapviewer initialization...");
     var map = createMap();
+    
     receiveItemListFromBackgroundPage(function(itemList) {
-        console.log(itemList.length + "items were retrieved from background thread");
-
+        log(itemList.length + "items were retrieved from background thread");
         placeItemListMarkersOnMap(map, itemList);
     });
 });
