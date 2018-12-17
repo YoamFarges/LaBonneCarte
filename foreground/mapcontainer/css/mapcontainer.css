@@ -20,7 +20,6 @@
 #lbca_container .pagination {
   margin: 10px 0;
 }
-
-#lbca_iframe {
-  background: lightgrey;
+#lbca_container {
+  margin-bottom: 2em;
 }

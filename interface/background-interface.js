@@ -7,8 +7,8 @@ class BackgroundInterface {
     isMapHidden() {
         return new Promise(function (resolve, reject) {
             let requestDTO = new RequestDTO(MethodKeys.GET_IS_MAP_HIDDEN);
-            chrome.extension.sendMessage(requestDTO, function callback(mapHiddenDTO) {
-                resolve(mapHiddenDTO.isMapHidden);
+            chrome.extension.sendMessage(requestDTO, function callback(isMapHidden) {
+                resolve(isMapHidden);
             });
         });
     }
@@ -17,8 +17,8 @@ class BackgroundInterface {
         return new Promise(function (resolve, reject) {
             let mapHiddenDTO = new MapHiddenDTO(newValue);
             let requestDTO = new RequestDTO(MethodKeys.SET_IS_MAP_HIDDEN, mapHiddenDTO);
-            chrome.extension.sendMessage(requestDTO, function callback(mapHiddenDTO) {
-                resolve(mapHiddenDTO.isMapHidden);
+            chrome.extension.sendMessage(requestDTO, function callback(isMapHidden) {
+                resolve(isMapHidden);
             });
         });
     }
@@ -27,8 +27,18 @@ class BackgroundInterface {
         return new Promise(function (resolve, reject) {
             let itemsDTO = new ItemsDTO(items);
             let requestDTO = new RequestDTO(MethodKeys.SET_ITEMS, itemsDTO);
-            chrome.extension.sendMessage(requestDTO, function callback(requestDTO) {
-                resolve(requestDTO.innerDTO);
+            chrome.extension.sendMessage(requestDTO, function callback(items) {
+                resolve(items);
+            });
+        });
+    }
+
+    getGeocode(location) {
+        return new Promise(function (resolve, reject) {
+            let dto = new GetGeocodeDTO(location);
+            let requestDTO = new RequestDTO(MethodKeys.GET_GEOCODE, dto);
+            chrome.extension.sendMessage(requestDTO, function callback(geocode) {
+                resolve(geocode);
             });
         });
     }

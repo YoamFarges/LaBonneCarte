@@ -15,8 +15,9 @@ class WebpageParser {
     - Returns: a javascript node object if found. Null otherwise.
     */
     getPageTitleNode() {
-         var titleNode = document.querySelector(".bgMain").querySelector("h1");
-         return titleNode;
+        var bgMain = document.querySelector(".bgMain");
+        if (!bgMain) { return null; }
+        return bgMain.querySelector("h1");
     }
 
     /*

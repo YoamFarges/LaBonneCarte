@@ -1,1 +1,14 @@
-body{margin:0}#lbca_map{width:100%;height:420px;background:#e6e6e6}
+body {
+  margin: 0;
+}
+#lbca_map {
+  width: 100%;
+  height: 420px;
+  background: #e6e6e6;
+}
+.marker {
+  background-image: url('../img/pinicon_default.png');
+  width: 24px;
+  height: 42px;
+  cursor: pointer;
+}

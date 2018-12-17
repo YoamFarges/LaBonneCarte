@@ -2,6 +2,6 @@ function log(text) {
     console.log("[LaBonneCarte] " + text);
 }
 
-function logError() {
+function logError(text) {
     log("⚠️ " + text);
 }

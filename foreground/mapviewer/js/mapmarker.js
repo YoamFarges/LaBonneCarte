@@ -1,4 +1,4 @@
-var BackgroundInterface = function() {
+var MarkerBackgroundInterface = function() {
     this.searchGeocode = function(location, callback) {
         chrome.extension.sendMessage({method: 'searchGeocode', location:location}, callback);
     }
@@ -8,21 +8,21 @@ var BackgroundInterface = function() {
     }
 
     this.getJsonFromExternalUrl = function(url, callback) {
-        chrome.extension.sendMessage({method: 'getJSON', url:url}, callback);
+        chrome.extension.sendMessage({method: MethodKeys.GET_EXTERNAL_JSON, url:url}, callback);
     }
 }
 
 /*
-    A wrapper class for Google Map marker, will handle all the functions to
+    A wrapper class for Map marker, will handle all the functions to
     put a Leboncoin item on the google map.
 */
-var MapMarker = function(item) {
+var OldMapMarker = function(item) {
     var that = this;
 
     this.item = item;
     this.geocode = null;
     this.googleMarker = null;
-    this.backgroundInterface = new BackgroundInterface();
+    this.backgroundInterface = new MarkerBackgroundInterface();
 
     this.createGoogleMarker = function(map) {
         if (!this.geocode) {throw new Error("CreateMarker requires an existing geocode");}
@@ -32,7 +32,7 @@ var MapMarker = function(item) {
             position: latlng,
             map: map,
             animation: google.maps.Animation.DROP,
-            icon: MapMarker.defaultPinIcon(),
+            icon: OldMapMarker.defaultPinIcon(),
         });
 
         this.googleMarker = marker;
@@ -91,7 +91,7 @@ var MapMarker = function(item) {
     PIN COLOR
 \*-------------------------*/
 
-MapMarker.pinIcon = function(imageName) {
+OldMapMarker.pinIcon = function(imageName) {
     return {
         url: chrome.extension.getURL('mapviewer/img/' + imageName),
         size: new google.maps.Size(24, 42),
@@ -100,5 +100,5 @@ MapMarker.pinIcon = function(imageName) {
     };
 }
 
-MapMarker.defaultPinIcon = function() {return MapMarker.pinIcon("pinicon_default.png");}
-MapMarker.selectedPinIcon = function() {return MapMarker.pinIcon("pinicon_selected.png");}
+OldMapMarker.defaultPinIcon = function() {return OldMapMarker.pinIcon("pinicon_default.png");}
+OldMapMarker.selectedPinIcon = function() {return OldMapMarker.pinIcon("pinicon_selected.png");}

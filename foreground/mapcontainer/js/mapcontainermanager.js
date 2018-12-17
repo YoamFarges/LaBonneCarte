@@ -6,7 +6,13 @@ class MapContainerManager {
         this.mapViewerURL = chrome.extension.getURL('foreground/mapviewer/html/mapviewer.html');
     }
 
-    init() {
+    initIfNeeded() {
+        // If the map looks already loaded, abort.
+        const container = document.getElementById("lbca_iframe_container");
+        if (container) {
+            return;
+        }
+
         const self = this;
 
         //Retrieve title
