@@ -54,7 +54,7 @@ class WebpageParser {
             item.linkUrl = appendHost(a.getAttribute('href'));
 
             var price = offer.querySelector('[itemprop="price"]');
-            item.price = price ? price.innerText + " €" : "";
+            item.price = price ? price.innerText : "";
 
             var category = offer.querySelector('[itemprop="alternateName"]');
             item.category = category ? category.innerText : "";

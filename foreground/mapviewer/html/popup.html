@@ -1,0 +1,43 @@
+<style>
+    #lbca_popup_content { width: 280px; margin: 0; }
+
+    .lbca_popup h2 {font-size: 16px; color: #1a1a1a;}
+    .lbca_popup .pull-right {float: right;}
+    .lbca_popup .pull-left {float: left;}
+    .lbca_popup .clearfix {clear: both;}
+    .lbca_popup .right {text-align: right;}
+
+    .lbca_popup .price {font-size: 16px; font-weight: bold; color: #f56b2b;}
+
+    .lbca_popup h2 {margin: 0; margin-bottom: 8px; margin-top: 5px;}
+    .lbca_popup p {margin: 0; margin-bottom: 5px;}
+    .lbca_popup p + p {margin-top: 5px;}
+
+    .lbca_popup .date {padding-right: 5px;}
+    .lbca_popup hr {border: none; border-bottom: 1px solid #eee;}
+
+    .lbca_popup img {height: 100px; max-width: 200px}
+    .lbca_popup img.center {
+        display: block;
+        margin: 0 auto;
+    }
+
+    .lbca_popup .hidden {display:none;}
+    .lbca_popup .bg {background: #f2f2f2;}
+</style>
+<div id="lbca_popup_content" class="lbca_popup">
+    <div class="bg __HIDDEN__">
+        <img class="center" src="__PICTUREURL__" />
+    </div>
+    <h2 id="firstHeading" class="firstHeading">__TITLE__</h2>
+    <div id="bodyContent">
+        <p class="price">__PRICE__</p>
+        <p>__CATEGORY__</p>
+        <p>__LOCATION__</p>
+        <hr>
+        <div class="clearfix">
+            <p class="pull-left date">__DATE__</p>
+            <a href="__LINKURL__" target="_blank" class="pull-right right">Voir l'annonce ></a>
+        </div>
+    </div>
+</div>

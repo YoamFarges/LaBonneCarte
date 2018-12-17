@@ -1,21 +1,32 @@
 
 $(document).ready(function() {
-    log("Mapviewer initialization...");
-    
-    var backgroundInterface = new BackgroundInterface();
-    var markerFactory = new MarkerFactory(backgroundInterface);
+    log("Mapviewer initialization... Will retrieve popup templates");
 
-    var mapManager = new MapManager(markerFactory);
-    mapManager.init(mapboxAccessToken);
+    getPopupTemplate(function callback(template) {
+        log("Popup template was retrieved!")
 
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.method == MethodKeys.DID_UPDATE_ITEMS) {
-            const itemsDTO = request.innerDTO;
-            const items = itemsDTO.items;
-            log(`Mapviewer received message DID_UPDATE_ITEMS and will try to place ${items.length} items on the map.`);
-            mapManager.updateItems(items);
-        }
+        const backgroundInterface = new BackgroundInterface();
+        const popupFactory = new PopupFactory(template);
+        const markerFactory = new MarkerFactory(backgroundInterface, popupFactory);
+        
+        this.mapManager = new MapManager(markerFactory);
+        this.mapManager.init(mapboxAccessToken);
+
+        listenToBackground(this.mapManager);
+
+        log("Mapviewer is fully initialized");
     });
+
+    function listenToBackground(mapManager) {
+        chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+            if (request.method == MethodKeys.DID_UPDATE_ITEMS) {
+                const itemsDTO = request.innerDTO;
+                const items = itemsDTO.items;
+                log(`Mapviewer received message DID_UPDATE_ITEMS and will try to place ${items.length} items on the map.`);
+                mapManager.updateItems(items);
+            }
+        });
+    }
 });
 
 class MapManager {
@@ -37,17 +48,25 @@ class MapManager {
     }
 
     placeItems(items) {
-        items.forEach(item => {
-            this.placeItem(item);
+        var counter = 0;
+        const self = this;
+        items.forEach(function (item, i) {
+            self.placeItem(item, (_ => {
+                if (i == items.length - 1) {
+                    log("This is the last! Will make the map fit to the markers bounds.");
+                    self.fitMapToMarkerBounds();
+                }
+            }));
         });
     }
 
-    placeItem(item) {
+    placeItem(item, callback) {
         var self = this;
-        this.markerFactory.makeMarker(item, function callback(marker) {
+        this.markerFactory.makeMarker(item, function (marker) {
             log(`Marker was created for item ${item.title} / ${item.location} at ${JSON.stringify(marker.lngLat)}`);
             self.markers.push(marker);
             marker.mapboxMarker.addTo(self.map);
+            callback();
         });
     }
 
@@ -75,75 +94,48 @@ class MapManager {
 
         return map;
     }
-}
 
-function placeItemListMarkersOnMap(map, items) {
-    items.forEach(item => {
-        
-    });
+    fitMapToMarkerBounds() {
+        var bounds = new mapboxgl.LngLatBounds();
 
-    return;
-    
-    var mapMarkers = [];
-    var infowindow = new google.maps.InfoWindow(); //Just one reusable infowindow with modified content
-    var oms = new OverlappingMarkerSpiderfier(map, {keepSpiderfied: true, legWeight:1});
-    var boundsToFit = new google.maps.LatLngBounds();
-
-    getInfowindowTemplate(function (template) {
-        $.each(itemList, function iterateOverNextItem(index, item) {
-            var mapMarker = new OldMapMarker(item);
-            mapMarkers.push(mapMarker);
-
-            mapMarker.loadGeocode(function() {
-                var marker = mapMarker.createGoogleMarker(map);
-                marker.desc = mapMarker.infowindowContent(template);
-                boundsToFit.extend(marker.position);
-                oms.addMarker(marker);
-                if (index == itemList.length - 1) {
-                    map.fitBounds(boundsToFit);
-                }
-            }); //load geocode
-        }); //iterate
-    }); //getInfoWindowTemplate
-
-    handleEvents(map, oms, infowindow);
-}
-
-function handleEvents(map, oms, infowindow) {
-    google.maps.event.addListener(map, "click", function(event) {
-        infowindow.close();
-    });
-
-    oms.addListener('click', function(marker) {
-        infowindow.close();
-        infowindow.setContent(marker.desc);
-        infowindow.open(map, marker);
-    });
-
-    oms.addListener('spiderfy', function(markers) {
-        infowindow.close();
-        $.each(markers, function(index, marker){
-           marker.setIcon(OldMapMarker.selectedPinIcon());
-           if (index == markers.length - 1) {
-               google.maps.event.trigger(marker, 'click');
-           }
+        this.markers.forEach(marker => {
+            bounds.extend(marker.lngLat);
         });
-    });
 
-    oms.addListener('unspiderfy', function(markers) {
-        infowindow.close();
-        $.each(markers, function(index, marker){
-            marker.setIcon(OldMapMarker.defaultPinIcon());
-        });
-    });
+        this.map.fitBounds(bounds, {padding: 50});
+    }
 }
 
+// function handleEvents(map, oms, infowindow) {
+//     google.maps.event.addListener(map, "click", function(event) {
+//         infowindow.close();
+//     });
 
-/*-------------------------*\
-    INFOWINDOW
-\*-------------------------*/
+//     oms.addListener('click', function(marker) {
+//         infowindow.close();
+//         infowindow.setContent(marker.desc);
+//         infowindow.open(map, marker);
+//     });
 
-function getInfowindowTemplate(callback) {
-    var url = chrome.extension.getURL('foreground/mapviewer/html/infowindow.html');
+//     oms.addListener('spiderfy', function(markers) {
+//         infowindow.close();
+//         $.each(markers, function(index, marker){
+//            marker.setIcon(OldMapMarker.selectedPinIcon());
+//            if (index == markers.length - 1) {
+//                google.maps.event.trigger(marker, 'click');
+//            }
+//         });
+//     });
+
+//     oms.addListener('unspiderfy', function(markers) {
+//         infowindow.close();
+//         $.each(markers, function(index, marker){
+//             marker.setIcon(OldMapMarker.defaultPinIcon());
+//         });
+//     });
+// }
+
+function getPopupTemplate(callback) {
+    var url = chrome.extension.getURL('foreground/mapviewer/html/popup.html');
     $.get(url, callback, 'html');
 }

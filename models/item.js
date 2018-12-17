@@ -1,7 +1,7 @@
 class Item {
   constructor() {
     this.title = 'undefined';
-    this.price = '0 €';
+    this.price = '0';
     this.category = '';
     this.date = '';
     this.location = '';
