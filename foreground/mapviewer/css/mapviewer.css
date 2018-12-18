@@ -12,3 +12,14 @@ body {
   height: 42px;
   cursor: pointer;
 }
+.mapboxgl-popup-content {
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+.mapboxgl-popup-close-button {
+  background: #f56b2b;
+  color: white;
+}
+.mapboxgl-popup-close-button:hover {
+  background: #f78d5c;
+}

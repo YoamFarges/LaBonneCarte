@@ -63,7 +63,7 @@ class WebpageParser {
             item.location = location ? location.innerText: "";
 
             var date = offer.querySelector('[itemprop="availabilityStarts"]');
-            item.date = date ? category.getAttribute("content") : "";
+            item.date = date ? date.getAttribute("content") : "";
 
             var img = offer.querySelector("img");
             var imgSrc = img ? img.getAttribute("src") : null;

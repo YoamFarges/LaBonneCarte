@@ -65,7 +65,20 @@ class MapManager {
         this.markerFactory.makeMarker(item, function (marker) {
             log(`Marker was created for item ${item.title} / ${item.location} at ${JSON.stringify(marker.lngLat)}`);
             self.markers.push(marker);
+            const mapboxMarker = marker.mapboxMarker;
+
             marker.mapboxMarker.addTo(self.map);
+            marker.div.addEventListener('click', () => {
+                const markerCenter = marker.lngLat;
+                const zoom = self.map.getZoom();
+
+                const metersPerPixel = self.metersPerPixel(markerCenter.lat, zoom);
+                const requiredOffsetInPixels = 90;
+                const latitudeOffset =  (requiredOffsetInPixels * metersPerPixel) / 111111;
+                const lngLat = {lng: markerCenter.lng, lat: markerCenter.lat + latitudeOffset};
+
+                self.map.flyTo({center:lngLat, zoom: zoom});
+            });
             callback();
         });
     }
@@ -104,6 +117,13 @@ class MapManager {
 
         this.map.fitBounds(bounds, {padding: 50});
     }
+
+
+    metersPerPixel(latitude, zoomLevel) {
+        var earthCircumference = 40075017;
+        var latitudeRadians = latitude * (Math.PI / 180);
+        return earthCircumference * Math.cos(latitudeRadians) / Math.pow(2, zoomLevel + 8);
+    };
 }
 
 // function handleEvents(map, oms, infowindow) {

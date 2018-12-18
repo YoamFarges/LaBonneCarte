@@ -19,12 +19,14 @@ class Marker {
         this.geocode = geocode;
         this.lngLat = new mapboxgl.LngLat(geocode.longitude, geocode.latitude);
 
+        this.div = null;
         this.mapboxMarker = this.makeMapboxMarker();
     }
 
     makeMapboxMarker() {
         var element = document.createElement("div");
         element.className = "marker";
+        this.div = element;
 
         return new mapboxgl.Marker(element)
             .setLngLat(this.lngLat)
@@ -39,7 +41,7 @@ class PopupFactory {
 
     popupForItem(item) {
         return new mapboxgl
-            .Popup({ offset: 25 })
+            .Popup({ offset: 25, anchor:'bottom' })
             .setHTML(this.popupHTMLForItem(item));
     }
 
