@@ -72,12 +72,10 @@ class MapManager {
                 const markerCenter = marker.lngLat;
                 const zoom = self.map.getZoom();
 
-                const metersPerPixel = self.metersPerPixel(markerCenter.lat, zoom);
-                const requiredOffsetInPixels = 90;
-                const latitudeOffset =  (requiredOffsetInPixels * metersPerPixel) / 111111;
+                const latitudeOffset = self.latitudeOffsetForPixels(90, markerCenter.lat, zoom);
                 const lngLat = {lng: markerCenter.lng, lat: markerCenter.lat + latitudeOffset};
 
-                self.map.flyTo({center:lngLat, zoom: zoom});
+                self.map.easeTo({center:lngLat, zoom: zoom});
             });
             callback();
         });
@@ -118,6 +116,10 @@ class MapManager {
         this.map.fitBounds(bounds, {padding: 50});
     }
 
+    latitudeOffsetForPixels(pixels, currentLatitude, zoomLevel) {
+        const metersPerPixel = this.metersPerPixel(currentLatitude, zoomLevel);
+        return (pixels * metersPerPixel) / 111111;
+    }
 
     metersPerPixel(latitude, zoomLevel) {
         var earthCircumference = 40075017;
