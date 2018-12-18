@@ -23,3 +23,6 @@
 #lbca_container {
   margin-bottom: 2em;
 }
+.bgMain > div:first-child > div:first-child {
+  width: 100%;
+}
