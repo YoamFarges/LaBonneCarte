@@ -5,6 +5,5 @@ class Geocode {
         this.longitude = longitude;
         
         this.lngLat = new mapboxgl.LngLat(longitude, latitude);
-
     }
 }

@@ -2,6 +2,7 @@ class MapManager {
     constructor(popupFactory) {
         this.popupFactory = popupFactory;
         this.markers = [];
+        this.franceBounds = {center:[2.6025, 46.34], zoom:4}
     }
 
     loadMap() {
@@ -9,8 +10,8 @@ class MapManager {
          this.map = new mapboxgl.Map({
             container: 'lbca_map',
             style: 'mapbox://styles/mapbox/streets-v10',
-            center: [2.6025, 46.34],
-            zoom: 4
+            center: this.franceBounds.center,
+            zoom: this.franceBounds.zoom
         });
     
         var navigationControl = new mapboxgl.NavigationControl({
@@ -61,13 +62,23 @@ class MapManager {
     }
 
     fitMapToMarkerBounds() {
-        // var bounds = new mapboxgl.LngLatBounds();
+        if (this.markers.length == 0) {
+            this.map.easeTo(this.franceBounds);
+            return;
+        }
+        
+        if (this.markers.length == 1) {
+            const marker = this.markers[0];
+            this.map.easeTo({center:marker.lngLat});
+            return;
+        }
 
-        // this.markers.forEach(marker => {
-        //     bounds.extend(marker.lngLat);
-        // });
-
-        // this.map.fitBounds(bounds, {padding: 50});
+        var bounds = new mapboxgl.LngLatBounds();
+        this.markers.forEach(marker => {
+            const lngLat = [marker.lngLat.lng, marker.lngLat.lat]; // only [lng, lat] format works for extending bounds...
+            bounds.extend(lngLat);
+        });
+        this.map.fitBounds(bounds, {padding: 50});
     }
 
     latitudeOffsetForPixels(pixels, currentLatitude, zoomLevel) {

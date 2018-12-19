@@ -27,7 +27,7 @@ class PopupFactory {
 
     popupForItem(item) {
         return new mapboxgl
-            .Popup({ offset: 25, anchor:'bottom' })
+            .Popup({ offset: 24, anchor:'bottom' })
             .setHTML(this.popupHTMLForItem(item));
     }
 
