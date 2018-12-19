@@ -67,7 +67,7 @@ class WebpageParser {
 
             var img = offer.querySelector("img");
             var imgSrc = img ? img.getAttribute("src") : null;
-            item.pictureUrl = imgSrc ? imgSrc : chrome.extension.getURL('foreground/mapviewer/img/no_image.jpg');
+            item.pictureUrl = imgSrc ? imgSrc : chrome.extension.getURL('foreground/map/img/no_image.jpg');
 
             return item;
         }

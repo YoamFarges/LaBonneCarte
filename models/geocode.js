@@ -3,5 +3,8 @@ class Geocode {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
+        
+        this.lngLat = new mapboxgl.LngLat(longitude, latitude);
+
     }
 }

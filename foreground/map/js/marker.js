@@ -1,26 +1,12 @@
-class MarkerFactory {
-    constructor(backgroundInterface, popupFactory) {
-        this.backgroundInterface = backgroundInterface;
-        this.popupFactory = popupFactory;
-    }
-
-    makeMarker(item, callback) {
-        this.backgroundInterface.getGeocode(item.location).then(geocode => {
-            const marker = new Marker(item, geocode, this.popupFactory);
-            callback(marker);
-        });
-    }
-}
-
 class Marker {
-    constructor(item, geocode, popupFactory) {
+    constructor(geocodedItem, popupFactory) {
         this.popupFactory = popupFactory;
-        this.item = item;
-        this.geocode = geocode;
-        this.lngLat = new mapboxgl.LngLat(geocode.longitude, geocode.latitude);
-
-        this.div = null;
+        this.geocodedItem = geocodedItem;
         this.mapboxMarker = this.makeMapboxMarker();
+    }
+
+    get lngLat() {
+        return this.geocodedItem.geocode.lngLat;
     }
 
     makeMapboxMarker() {
@@ -29,8 +15,8 @@ class Marker {
         this.div = element;
 
         return new mapboxgl.Marker(element)
-            .setLngLat(this.lngLat)
-            .setPopup(this.popupFactory.popupForItem(this.item));
+            .setLngLat(this.geocodedItem.geocode.lngLat)
+            .setPopup(this.popupFactory.popupForItem(this.geocodedItem.item));
     }
 }
 
