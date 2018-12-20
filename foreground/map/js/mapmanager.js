@@ -6,6 +6,7 @@ class MapManager {
         this.franceBounds = { center: [2.6025, 46.34], zoom: 4 }
         this.zoomSpiderifyTreshold = 8;
         this.iconImgURL = chrome.extension.getURL('foreground/map/img/pinicon.png');
+        this.clusterPopup = null;
     }
 
     loadMap() {
@@ -33,6 +34,7 @@ class MapManager {
                     self.initializeSpiderifier();
                     self.initializeMapLayers();
                     self.initializeMapActions();
+                    
                     log("MapManager did finish map creation");
                     resolve();
                 });
@@ -90,7 +92,14 @@ class MapManager {
             source: 'pins',
             filter: ['all', ['has', 'point_count']],
             paint: {
-                'circle-color': '#f56b2b',
+                'circle-color': [
+                    "interpolate", ["linear"], ["zoom"],
+                    // zoom is 8 (or less) -> color will be orange
+                    this.zoomSpiderifyTreshold, '#f56b2b',
+                    // in between, color will be interpolated
+                    this.zoomSpiderifyTreshold + 0.05, '#e74c3c'
+                    // zoom is 8.05 (or greater) -> color will be red
+                ],
                 'circle-radius': 14
             }
         });
@@ -111,38 +120,26 @@ class MapManager {
 
     initializeSpiderifier() {
         const map = this.map;
+        const self = this;
         this.spiderifier = new MapboxglSpiderifier(map, {
             circleSpiralSwitchover: 9,
-            customPin: true,
-            initializeLeg: function (spiderLeg) {
-                var $spiderPinCustom = $('<div>', { class: 'spider-point-circle' });
+            customPin: false,
+            onClick: function (e, marker) {
+                const markerLngLat = marker.mapboxMarker.getLngLat();
+                const item = marker.feature;
+                const offset = MapboxglSpiderifier.popupOffsetForSpiderLeg(marker, 36);
 
-                $(spiderLeg.elements.pin).append($spiderPinCustom);
-                $spiderPinCustom.css({
-                    'width': '10px',
-                    'height': '10px',
-                    'margin-left': '-5px',
-                    'margin-top': '-5px',
-                    'background-color': '#ff0000',
-                    'opacity': 0.8
-                });
+                map.easeTo({ center: markerLngLat, offset: {x: -marker.param.x, y: -marker.param.y + 200, z: 0} });
 
-                var popup = new mapboxgl.Popup({
-                    closeButton: true,
-                    closeOnClick: false,
-                    offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
-                });
+                if (self.clusterPopup) { self.clusterPopup.remove(); }
+                self.clusterPopup = self.makePopup(item, markerLngLat, offset, false);
+                self.clusterPopup.addTo(map);
+                
+                self.clusterPopup.on('close', function(e) {
+                    self.clusterPopup = null;
+                })
 
-                popup.setHTML('WHAAAT');
-                spiderLeg.mapboxMarker.setPopup(popup);
-
-                $(spiderLeg.elements.container)
-                    .on('mouseenter', function () {
-                        popup.addTo(map);
-                    })
-                    .on('mouseleave', function () {
-                        popup.remove();
-                    });
+                e.stopPropagation();
             }
         })
     }
@@ -152,11 +149,13 @@ class MapManager {
         const map = this.map;
         const spiderifier = this.spiderifier;
 
-        map.on('zoomstart', function () {
+        map.on('click', function() {
+            self.removeClusterPopup();
             spiderifier.unspiderfy();
         });
 
-        map.on('click', function() {
+        map.on('zoomstart', function () {
+            self.removeClusterPopup();
             spiderifier.unspiderfy();
         });
 
@@ -169,24 +168,19 @@ class MapManager {
         });
 
         map.on('click', 'pins', function(e) {
+            self.removeClusterPopup();
+            spiderifier.unspiderfy();
+
             const feature = e.features[0];
             if (!feature) { return; }
 
             const featureCenter = feature.geometry.coordinates;
             const featureLngLat = {lng: featureCenter[0], lat: featureCenter[1]};
-            const zoom = self.map.getZoom();
-            const latitudeOffset = latitudeOffsetForPixels(85, featureLngLat.lat, zoom);
-            const lngLat = { lng: featureLngLat.lng, lat: featureLngLat.lat + latitudeOffset };
-            self.map.easeTo({ center: lngLat, zoom: zoom });
-
             const item = feature.properties;
-            const popupHTML = self.popupFactory.htmlForItem(item);
-            const popup = PopupFactory.makePopup();
-            popup.setLngLat(featureCenter)
-                .setHTML(popupHTML)
-                .addTo(map);
 
-            return;
+            map.easeTo({ center: featureLngLat, offset: {x: 0, y: 180, z: 0} });
+            const popup = self.makePopup(item, featureLngLat, 20, true);
+            popup.addTo(map);
         });
 
         map.on('mouseenter', 'cluster-pins', function(e) {
@@ -219,5 +213,22 @@ class MapManager {
                 }
             );
         });
+    }
+
+    removeClusterPopup() {
+        if (this.clusterPopup) { this.clusterPopup.remove(); }
+    }
+
+    makePopup(item, lngLat, popupOffset, closeOnClick) {
+        const popupHTML = this.popupFactory.htmlForItem(item);
+        const popup = new mapboxgl.Popup({
+            closeOnClick: closeOnClick,
+            offset: popupOffset,
+            anchor: 'bottom'
+        })
+        popup.setLngLat(lngLat)
+        popup.setHTML(popupHTML)
+
+        return popup;
     }
 }
