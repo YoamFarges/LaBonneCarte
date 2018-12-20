@@ -9,11 +9,11 @@ class MapContainerManager {
         this.isMapHidden = isMapHidden;
     }
 
-    addContainerToPageIfNeeded() {
+    async addContainerToPageIfNeeded() {
         // If the container already exists on the page, abort.
         const extensionContainer = document.getElementById("lbca_extension_container");
         if (extensionContainer) {
-            return;
+            return Promise.resolve();
         }
 
         const self = this;
@@ -21,8 +21,7 @@ class MapContainerManager {
         //Retrieve title
         var titleNode = self.webpageParser.getPageTitleNode();
         if (!titleNode) {
-            logError("The page title has not been found. Extension Labonnecarte won't be displayed.")
-            return;
+            return Promise.reject("The page title has not been found. Extension Labonnecarte won't be displayed.");
         }
         
         //Load the map container below the title
@@ -33,7 +32,7 @@ class MapContainerManager {
         this.button = $('#lbca_button');
 
         //Finish setup
-        this.mapManager.loadMap();
+        await this.mapManager.loadMap();
         if (this.isMapHidden) {
             this.mapContainer.hide();
         }
@@ -42,7 +41,8 @@ class MapContainerManager {
         setupButtonClick();        
         setupFooterPagination();
 
-        log("Did successfully load map container");
+        log("Did finish loading map container");
+        return Promise.resolve();
 
         function setupButtonClick() {
             self.button.click(function onButtonClick() {

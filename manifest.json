@@ -54,9 +54,11 @@
             "lib/jquery-2.2.3.min.js",
             "lib/mapbox-gl-v0.51.0.js",
             "lib/mapbox-sdk.min.v0.41.0.js",
+            "lib/mapboxgl-spiderifier.js",
 
             "utils/logger.js",
             "utils/extractHostFromURL.js",
+            "utils/meters-per-pixel.js",
 
             "models/item.js",
             "models/geocode.js",
@@ -67,7 +69,7 @@
 
             "interface/background-interface.js",
             "foreground/parser/webpageparser.js",
-            "foreground/map/js/marker.js",
+            "foreground/map/js/popup-factory.js",
             "foreground/map/js/mapmanager.js",
             "foreground/container/js/mapcontainermanager.js",
             

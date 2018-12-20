@@ -15,7 +15,6 @@ async function runApp() {
     const popupFactory = new PopupFactory(popupTemplateHTML);
     const mapManager = new MapManager(popupFactory);
     const mapContainerManager = new MapContainerManager(backgroundInterface, webpageParser, mapManager, containerHTML, isMapHidden);
-    mapContainerManager.addContainerToPageIfNeeded();
 
     async function updateItems() {
         let items = webpageParser.parseItems();
@@ -26,9 +25,10 @@ async function runApp() {
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.method == MethodKeys.TAB_DID_REFRESH) {
-            log("[main.js] ... background requests an item update");
-            mapContainerManager.addContainerToPageIfNeeded();
-            updateItems();
+            mapContainerManager
+            .addContainerToPageIfNeeded()
+            .then(updateItems)
+            .catch(e => logError(e));
         }
     });
 }

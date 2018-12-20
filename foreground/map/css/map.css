@@ -3,13 +3,6 @@
   height: 420px;
   background: #e6e6e6;
 }
-
-.marker {
-  background-image: url('chrome-extension://__MSG_@@extension_id__/foreground/map/img/pinicon_default.png');
-  width: 24px;
-  height: 42px;
-  cursor: pointer;
-}
 .mapboxgl-popup-content {
   padding-bottom: 5px;
   padding-top: 5px;
