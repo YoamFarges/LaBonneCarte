@@ -58,7 +58,6 @@
 
             "utils/logger.js",
             "utils/extractHostFromURL.js",
-            "utils/meters-per-pixel.js",
 
             "models/item.js",
             "models/geocode.js",
