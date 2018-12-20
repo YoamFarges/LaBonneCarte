@@ -25,10 +25,16 @@ async function runApp() {
 
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.method == MethodKeys.TAB_DID_REFRESH) {
-            mapContainerManager
-            .addContainerToPageIfNeeded()
-            .then(updateItems)
-            .catch(e => logError(e));
+            log("Tab was refreshed. Will trigger item update.")
+
+            //Delay because node still loads content even after 'complete' tab refresh.
+            //This doesn't prevent ALL failed map load but it helps.
+            setTimeout(function() {
+                mapContainerManager
+                .addContainerToPageIfNeeded()
+                .then(updateItems)
+                .catch(e => logError(e));
+            }, 200);
         }
     });
 }
