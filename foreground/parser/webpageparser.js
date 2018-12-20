@@ -36,36 +36,36 @@ class WebpageParser {
     - Returns: an array of Item objects.
     */
     parseItems() {
-        var offersNodeList = this.document.querySelectorAll('[itemtype="http://schema.org/Offer"]');
-        return Array.from(offersNodeList).map(itemFromOffer);
+        var nodes = this.document.querySelectorAll('[itemtype="http://schema.org/Offer"], [itemtype="http://schema.org/Demand"]');
+        return Array.from(nodes).map(itemFromNodes);
 
         /*
-        Map an Offer <li> object from the leboncoin's page to an Item object usable
+        Map a Node <li> object from the leboncoin's page to an Item object usable
         by our extension.
 
         - Returns: an Item object
         */
-        function itemFromOffer(offer) {
+        function itemFromNodes(node) {
             var item = new Item();
 
-            var a = offer.querySelector("a");
+            var a = node.querySelector("a");
             item.title = a.getAttribute("title").trim();
 
             item.linkUrl = appendHost(a.getAttribute('href'));
 
-            var price = offer.querySelector('[itemprop="price"]');
+            var price = node.querySelector('[itemprop="price"]');
             item.price = price ? price.innerText : "";
 
-            var category = offer.querySelector('[itemprop="alternateName"]');
+            var category = node.querySelector('[itemprop="alternateName"]');
             item.category = category ? category.innerText : "";
 
-            var location = offer.querySelector('[itemprop="availableAtOrFrom"]');
+            var location = node.querySelector('[itemprop="availableAtOrFrom"]');
             item.location = location ? location.innerText: "";
 
-            var date = offer.querySelector('[itemprop="availabilityStarts"]');
+            var date = node.querySelector('[itemprop="availabilityStarts"]');
             item.date = date ? date.getAttribute("content") : "";
 
-            var img = offer.querySelector("img");
+            var img = node.querySelector("img");
             var imgSrc = img ? img.getAttribute("src") : null;
             item.pictureUrl = imgSrc ? imgSrc : chrome.extension.getURL('foreground/map/img/no_image.jpg');
 
