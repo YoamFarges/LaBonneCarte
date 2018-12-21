@@ -3,10 +3,10 @@ class MapManager {
         this.popupFactory = popupFactory;
         this.markers = [];
 
-        this.franceBounds = { center: [2.6025, 46.34], zoom: 4 }
+        this.franceBounds = { center: [2.6025, 46.34], zoom: 4.5 }
         this.zoomSpiderifyTreshold = 8;
         this.iconImgURL = chrome.extension.getURL('foreground/map/img/pinicon.png');
-        this.clusterPopup = null;
+        this.popup = null;
     }
 
     loadMap() {
@@ -43,9 +43,14 @@ class MapManager {
     }
 
     updateItems(geocodedItems) {
+        this.removePopup();
+        this.spiderifier.unspiderfy();
+
         const geojsonData = GeocodedItem.geoJSONFeatureCollection(geocodedItems);
         this.map.getSource("pins").setData(geojsonData);
         this.fitMapToMarkerBounds();
+
+        log("Map manager did update geojson data");
     }
 
     fitMapToMarkerBounds() {
@@ -131,12 +136,12 @@ class MapManager {
 
                 map.easeTo({ center: markerLngLat, offset: {x: -marker.param.x, y: -marker.param.y + 200, z: 0} });
 
-                if (self.clusterPopup) { self.clusterPopup.remove(); }
-                self.clusterPopup = self.makePopup(item, markerLngLat, offset, false);
-                self.clusterPopup.addTo(map);
+                if (self.popup) { self.popup.remove(); }
+                self.popup = self.makePopup(item, markerLngLat, offset, false);
+                self.popup.addTo(map);
                 
-                self.clusterPopup.on('close', function(e) {
-                    self.clusterPopup = null;
+                self.popup.on('close', function(e) {
+                    self.popup = null;
                 })
 
                 e.stopPropagation();
@@ -150,12 +155,12 @@ class MapManager {
         const spiderifier = this.spiderifier;
 
         map.on('click', function() {
-            self.removeClusterPopup();
+            self.removePopup();
             spiderifier.unspiderfy();
         });
 
         map.on('zoomstart', function () {
-            self.removeClusterPopup();
+            self.removePopup();
             spiderifier.unspiderfy();
         });
 
@@ -168,7 +173,7 @@ class MapManager {
         });
 
         map.on('click', 'pins', function(e) {
-            self.removeClusterPopup();
+            self.removePopup();
             spiderifier.unspiderfy();
 
             const feature = e.features[0];
@@ -179,7 +184,7 @@ class MapManager {
             const item = feature.properties;
 
             map.easeTo({ center: featureLngLat, offset: {x: 0, y: 180, z: 0} });
-            const popup = self.makePopup(item, featureLngLat, 20, true);
+            this.popup = self.makePopup(item, featureLngLat, 20, true);
             popup.addTo(map);
         });
 
@@ -215,8 +220,8 @@ class MapManager {
         });
     }
 
-    removeClusterPopup() {
-        if (this.clusterPopup) { this.clusterPopup.remove(); }
+    removePopup() {
+        if (this.popup) { this.popup.remove(); }
     }
 
     makePopup(item, lngLat, popupOffset, closeOnClick) {
