@@ -21,16 +21,6 @@ class WebpageParser {
     }
 
     /*
-    Retrieve the footer pagination container.
-
-    - Returns: a jQuery object if found. Null otherwise.
-    */
-    getFooterPagination() {
-        var pagination = $(".googleafs").next();
-        return pagination;
-    }
-
-    /*
     Retrieve the offers inside the document.
 
     - Returns: an array of Item objects.

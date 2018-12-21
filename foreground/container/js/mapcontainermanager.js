@@ -39,7 +39,6 @@ class MapContainerManager {
 
         self.updateButtonText(this.isMapHidden);
         setupButtonClick();        
-        setupFooterPagination();
 
         log("Did finish loading map container");
         return Promise.resolve();
@@ -55,17 +54,6 @@ class MapContainerManager {
                     self.updateButtonText(isContainerHidden);
                 });
             });
-        }
-
-        function setupFooterPagination() {
-            var footerPagination = self.webpageParser.getFooterPagination();
-            if (!footerPagination) {
-                logError("Impossible to clone pagination footer. Object was not found.");
-                return;
-            }
-
-            footerPagination.css("margin-top", "1em");
-            self.mapContainer.append(footerPagination.clone());
         }
     }
 
