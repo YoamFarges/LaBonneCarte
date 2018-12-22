@@ -33,7 +33,7 @@ async function runApp() {
                 mapContainerManager
                 .addContainerToPageIfNeeded()
                 .then(updateItems)
-                .catch(e => logError(e));
+                // .catch(e => logError(e));
             }, 200);
         }
     });

@@ -49,8 +49,17 @@ class WebpageParser {
             var category = node.querySelector('[itemprop="alternateName"]');
             item.category = category ? category.innerText : "";
 
-            var location = node.querySelector('[itemprop="availableAtOrFrom"]');
-            item.location = location ? location.innerText: "";
+            var locNode = node.querySelector('[itemprop="availableAtOrFrom"]');
+            if (locNode) {
+                const location = locNode.innerText;
+                item.location = location;
+
+                const lastIndex = location.lastIndexOf(' ');
+                if (lastIndex) {
+                    item.city = location.substr(0, lastIndex);
+                    item.postCode = location.substr(lastIndex + 1, location.length);
+                }
+            }
 
             var date = node.querySelector('[itemprop="availabilityStarts"]');
             item.date = date ? date.getAttribute("content") : "";

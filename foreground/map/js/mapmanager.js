@@ -48,30 +48,39 @@ class MapManager {
 
         const geojsonData = GeocodedItem.geoJSONFeatureCollection(geocodedItems);
         this.map.getSource("pins").setData(geojsonData);
-        this.fitMapToMarkerBounds();
+
+        // const self = this;
+        // setTimeout(function () { // So ugly but there is no "map.setData" callback yet
+        //     self.fitMapBoundingBox();
+        // }, 200);
 
         log("Map manager did update geojson data");
     }
 
-    fitMapToMarkerBounds() {
-        if (this.markers.length == 0) {
-            this.map.easeTo(this.franceBounds);
-            return;
-        }
+    // fitMapBoundingBox() {
+    //     const map = this.map;
 
-        if (this.markers.length == 1) {
-            const marker = this.markers[0];
-            this.map.easeTo({ center: marker.lngLat });
-            return;
-        }
+    //     const features = map.querySourceFeatures('pins');
 
-        var bounds = new mapboxgl.LngLatBounds();
-        this.markers.forEach(marker => {
-            const lngLat = [marker.lngLat.lng, marker.lngLat.lat]; // only [lng, lat] format works for extending bounds...
-            bounds.extend(lngLat);
-        });
-        this.map.fitBounds(bounds, { padding: 50 });
-    }
+    //     if (features.length == 0) {
+    //         map.easeTo(this.franceBounds);
+    //         return;
+    //     }
+
+    //     if (features.length == 1) {
+    //         const feature = features[0];
+    //         const lngLat = feature.geometry.coordinates
+    //         map.easeTo({ center: lngLat });
+    //         return;
+    //     }
+
+    //     var bounds = new mapboxgl.LngLatBounds();
+    //     features.forEach(feature => {
+    //         const lngLat = feature.geometry.coordinates;
+    //         bounds.extend(lngLat);
+    //     });
+    //     this.map.fitBounds(bounds, { padding: 50 });
+    // }
 
     initializeMapLayers() {
         const map = this.map;
@@ -185,7 +194,7 @@ class MapManager {
 
             map.easeTo({ center: featureLngLat, offset: {x: 0, y: 180, z: 0} });
             this.popup = self.makePopup(item, featureLngLat, 20, true);
-            popup.addTo(map);
+            this.popup.addTo(map);
         });
 
         map.on('mouseenter', 'cluster-pins', function(e) {
