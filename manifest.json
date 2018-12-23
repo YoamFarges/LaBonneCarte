@@ -14,14 +14,16 @@
 
     "permissions": [
         "https://api.mapbox.com/*",
+        "https://api-adresse.data.gouv.fr/*",
         "tabs"
     ],
 
-    "content_security_policy": "script-src 'self' https://api.mapbox.com ; object-src 'self'",
+    "content_security_policy": "script-src 'self'; object-src 'self'",
 
     "web_accessible_resources": [
         "lib/*",
-        "foreground/map/*",
+        "foreground/map/img/*",
+        "foreground/map/html/*",
         "foreground/container/html/*"
     ],
 

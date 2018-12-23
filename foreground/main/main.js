@@ -30,6 +30,8 @@ async function runApp() {
             //Delay because node still loads content even after 'complete' tab refresh.
             //This doesn't prevent ALL failed map load but it helps.
             setTimeout(function() {
+                log("Item update start...")
+
                 mapContainerManager
                 .addContainerToPageIfNeeded()
                 .then(updateItems)
