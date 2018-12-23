@@ -49,38 +49,40 @@ class MapManager {
         const geojsonData = GeocodedItem.geoJSONFeatureCollection(geocodedItems);
         this.map.getSource("pins").setData(geojsonData);
 
-        // const self = this;
-        // setTimeout(function () { // So ugly but there is no "map.setData" callback yet
-        //     self.fitMapBoundingBox();
-        // }, 200);
+        const self = this;
+        setTimeout(function () { // So ugly but there is no "map.setData" callback yet
+            self.fitMapBoundingBox();
+        }, 200);
 
         log("Map manager did update geojson data");
     }
 
-    // fitMapBoundingBox() {
-    //     const map = this.map;
+    fitMapBoundingBox() {
+        const map = this.map;
 
-    //     const features = map.querySourceFeatures('pins');
+        const features = map.querySourceFeatures('pins');
+        this.map.easeTo(this.franceBounds);
+        return;
 
-    //     if (features.length == 0) {
-    //         map.easeTo(this.franceBounds);
-    //         return;
-    //     }
+        if (features.length == 0) { 
+            this.map.easeTo(this.franceBounds);
+            return;
+        }
 
-    //     if (features.length == 1) {
-    //         const feature = features[0];
-    //         const lngLat = feature.geometry.coordinates
-    //         map.easeTo({ center: lngLat });
-    //         return;
-    //     }
+        if (features.length == 1) {
+            const feature = features[0];
+            const lngLat = feature.geometry.coordinates
+            map.easeTo({ center: lngLat });
+            return;
+        }
 
-    //     var bounds = new mapboxgl.LngLatBounds();
-    //     features.forEach(feature => {
-    //         const lngLat = feature.geometry.coordinates;
-    //         bounds.extend(lngLat);
-    //     });
-    //     this.map.fitBounds(bounds, { padding: 50 });
-    // }
+        var bounds = new mapboxgl.LngLatBounds();
+        features.forEach(feature => {
+            const lngLat = feature.geometry.coordinates;
+            bounds.extend(lngLat);
+        });
+        this.map.fitBounds(bounds, { padding: 50 });
+    }
 
     initializeMapLayers() {
         const map = this.map;
