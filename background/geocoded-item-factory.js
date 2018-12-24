@@ -5,9 +5,7 @@ class GeocodedItemFactory {
 
     makeGeocodedItemFromItem(item) {
         return new Promise(resolve => {
-            const location = `${item.city}, ${item.postCode}`;
-
-            this.geocodeAPI.getGeocode(location).then(geocode => {
+            this.geocodeAPI.getGeocode(item.city, item.postCode).then(geocode => {
                 resolve(new GeocodedItem(item, geocode))
             });
         });
@@ -17,6 +15,7 @@ class GeocodedItemFactory {
         return new Promise(resolve => {
             var promises = items.map(item => this.makeGeocodedItemFromItem(item));
             Promise.all(promises).then(geocodedItems => {
+                log("qwdqhdiqwpdi");
                 resolve(geocodedItems);
             })
         });

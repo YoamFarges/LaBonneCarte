@@ -14,7 +14,7 @@ class GeocodedItem {
                     type: "Feature",
                     geometry: {
                         type: "Point",
-                        coordinates: [geocode.lngLat.lng, geocode.lngLat.lat]
+                        coordinates: [geocode.longitude, geocode.latitude]
                     },
                     properties: item
                 };

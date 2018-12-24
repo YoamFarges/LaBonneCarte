@@ -7,9 +7,8 @@
 
 log("Loading background...");
 
-const mapboxClient = mapboxSdk({ accessToken: mapboxAccessToken });
 const geocodeCache = new GeocodeCache();
-var geocodeAPI = new GeocodeAPI(geocodeCache, mapboxClient);
+var geocodeAPI = new GeocodeAPI(geocodeCache);
 var geocodedItemFactory = new GeocodedItemFactory(geocodeAPI);
 
 var isMapHidden = false;
@@ -50,5 +49,3 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(`The leboncoin's tab with ID ${tabId} has been updated.`)
     chrome.tabs.sendMessage(tabId, requestDTO);
 });
-
-

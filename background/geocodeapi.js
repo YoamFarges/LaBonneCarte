@@ -1,10 +1,11 @@
 class GeocodeAPI {
-    constructor(geocodeCache, mapboxClient) {
+    constructor(geocodeCache) {
         this.cache = geocodeCache;
-        this.client = mapboxClient;
     }
 
-    getGeocode(location) {
+    getGeocode(cityName, postCode) {
+        const location = this.makeLocation(cityName, postCode);
+
         log("GeocodeAPI will search for " + location);
         const cachedGeocode = this.cache.geocodeWithLocation(location);
         if (cachedGeocode) {
@@ -12,39 +13,28 @@ class GeocodeAPI {
             return  new Promise(resolve => { resolve(cachedGeocode); });
         }
 
-        const self = this;
-        return new Promise(resolve => {
-            this.retrieveGeocodeFromMapbox(location, function callback(geocode) {
-                log(`Geocode for '${location}' was found by using mapbox' API : ${JSON.stringify(geocode)}`);
-                self.cache.cacheGeocode(geocode);
-                resolve(geocode);
-            });
-        });
+        return this.retrieveGeocodeFromDataGouv(cityName, postCode);
     }
 
-    retrieveGeocodeFromMapbox(location, callback) {
-        this.client.geocoding.forwardGeocode({
-            query: location,
-            autocomplete: false,
-            limit: 1,
-            countries: ["fr"],
-            language: ["fr"],
-        })
-        .send()
-        .then(function (response) {
-            if (response && response.body && response.body.features && response.body.features.length) {
-                var feature = response.body.features[0];
-                const center = feature.center;
-                const geocode = new Geocode(location, center[1], center[0]);
-                callback(geocode);
-            } else {
-                logError('Error while fetching geocode');
-                log('... will retry in a few seconds');
-                setTimeout(function () {
-                    this.retrieveGeocodeFromMapbox(location, callback)
-                }, 1200);
-            }
-        });
+    async retrieveGeocodeFromDataGouv(cityName, postCode) {
+        const location = this.makeLocation(cityName, postCode);
+
+        log(`Retrieve "${location}" from data gouv api...`);
+        const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${cityName}&postcode=${postCode}&limit=1`);
+        const json = await response.json();
+        const feature = json.features[0];
+
+        if (!feature) { throw new Error(`No feature was found for location "${location}"`)}
+
+        const coordinates = feature.geometry.coordinates;
+        const longitude = coordinates[0];
+        const latitude = coordinates[1];
+        
+        return new Geocode(location, longitude, latitude);
+    }
+
+    makeLocation(cityName, postCode) {
+        return `${cityName} ${postCode}`;
     }
 }
 

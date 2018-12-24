@@ -1,9 +1,7 @@
 class Geocode {
-    constructor(location, latitude, longitude) {
+    constructor(location, longitude, latitude) {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
-        
-        this.lngLat = new mapboxgl.LngLat(longitude, latitude);
     }
 }

@@ -43,10 +43,13 @@ class MapManager {
     }
 
     updateItems(geocodedItems) {
+        log(`Map will update with ${geocodedItems.length} geocoded items`);
+
         this.removePopup();
         this.spiderifier.unspiderfy();
 
         const geojsonData = GeocodedItem.geoJSONFeatureCollection(geocodedItems);
+        console.log(geojsonData);
         this.map.getSource("pins").setData(geojsonData);
 
         const self = this;
