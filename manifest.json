@@ -33,6 +33,7 @@
 
         "utils/logger.js",
         "utils/extractHostFromURL.js",
+        "utils/utils.js",
 
         "models/item.js",
         "models/geocode.js",
@@ -57,6 +58,7 @@
 
             "utils/logger.js",
             "utils/extractHostFromURL.js",
+            "utils/utils.js",
 
             "models/item.js",
             "models/geocode.js",
