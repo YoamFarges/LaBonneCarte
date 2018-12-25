@@ -51,7 +51,7 @@ class WebpageParser {
 
             var locNode = node.querySelector('[itemprop="availableAtOrFrom"]');
             if (locNode) {
-                const location = locNode.innerText;
+                const location = locNode.innerText.replace("(pro) ", "");
                 item.location = location;
 
                 const lastIndex = location.lastIndexOf(' ');
