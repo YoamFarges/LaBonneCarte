@@ -3,21 +3,16 @@ class GeocodedItemFactory {
         this.geocodeAPI = geocodeAPI;
     }
 
-    makeGeocodedItemFromItem(item) {
-        return new Promise(resolve => {
-            this.geocodeAPI.getGeocode(item.city, item.postCode).then(geocode => {
-                resolve(new GeocodedItem(item, geocode))
-            });
-        });
+    async makeGeocodedItemFromItem(item) {
+        const geocode = await this.geocodeAPI.getGeocode(item.city, item.postCode);
+        return new GeocodedItem(item, geocode);
     }
 
-    makeGeocodedItemsFromItems(items) {
-        return new Promise(resolve => {
-            var promises = items.map(item => this.makeGeocodedItemFromItem(item));
-            Promise.all(promises).then(geocodedItems => {
-                log("qwdqhdiqwpdi");
-                resolve(geocodedItems);
-            })
-        });
+    async makeGeocodedItemsFromItems(items) {
+        const promises = items.map(item => this.makeGeocodedItemFromItem(item));
+        const results = await Promise.all(promises.map(p => p.catch(err => { 
+            console.log(err);
+        } )));
+        return results.filter(r => !!r);
     }
 }

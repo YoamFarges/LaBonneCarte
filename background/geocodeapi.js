@@ -3,23 +3,21 @@ class GeocodeAPI {
         this.cache = geocodeCache;
     }
 
-    getGeocode(cityName, postCode) {
+    async getGeocode(cityName, postCode) {
         const location = this.makeLocation(cityName, postCode);
 
-        log("GeocodeAPI will search for " + location);
         const cachedGeocode = this.cache.geocodeWithLocation(location);
         if (cachedGeocode) {
             log(`Geocode for '${location}' was already in cache : ${JSON.stringify(cachedGeocode)}`);
-            return  new Promise(resolve => { resolve(cachedGeocode); });
+            return cachedGeocode;
         }
 
-        return this.retrieveGeocodeFromDataGouv(cityName, postCode);
+        log(`Will retrieve "${location}" from data gouv api...`);
+        return await this.retrieveGeocodeFromDataGouv(cityName, postCode);
     }
 
     async retrieveGeocodeFromDataGouv(cityName, postCode) {
         const location = this.makeLocation(cityName, postCode);
-
-        log(`Retrieve "${location}" from data gouv api...`);
         const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${cityName}&postcode=${postCode}&limit=1`);
         const json = await response.json();
         const feature = json.features[0];
@@ -29,8 +27,10 @@ class GeocodeAPI {
         const coordinates = feature.geometry.coordinates;
         const longitude = coordinates[0];
         const latitude = coordinates[1];
+        const geocode = new Geocode(location, longitude, latitude);
+        this.cache.cacheGeocode(geocode);
         
-        return new Geocode(location, longitude, latitude);
+        return geocode;
     }
 
     makeLocation(cityName, postCode) {

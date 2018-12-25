@@ -42,14 +42,19 @@ class MapManager {
         });
     }
 
-    updateItems(geocodedItems) {
-        log(`Map will update with ${geocodedItems.length} geocoded items`);
+    clearItems() {
+        if (!this.spiderifier || !this.map) { return; }
 
         this.removePopup();
         this.spiderifier.unspiderfy();
+        const geojsonData = GeocodedItem.geoJSONFeatureCollection([]);
+        this.map.getSource("pins").setData(geojsonData);
+    }
+
+    updateItems(geocodedItems) {
+        log(`Map will update with ${geocodedItems.length} geocoded items`);
 
         const geojsonData = GeocodedItem.geoJSONFeatureCollection(geocodedItems);
-        console.log(geojsonData);
         this.map.getSource("pins").setData(geojsonData);
 
         const self = this;
