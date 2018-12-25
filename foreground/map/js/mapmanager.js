@@ -51,13 +51,11 @@ class MapManager {
     }
 
     updateItems(geocodedItems) {
-        log(`Map will update with ${geocodedItems.length} geocoded items`);
-
         const geojsonData = GeocodedItem.geoJSONFeatureCollection(geocodedItems);
         this.map.getSource("pins").setData(geojsonData);
         this.fitMapBoundingBox(geojsonData);
 
-        log("Map manager did update geojson data");
+        log("Map did finish marker update. You are ready to go! 👍");
     }
 
     fitMapBoundingBox(geojsonData) {
