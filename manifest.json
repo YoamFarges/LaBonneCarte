@@ -3,8 +3,8 @@
 
   "name": "La Bonne Carte",
   "short_name": "LaBonneCarte",
-  "description": "Cette extension vous permet d'afficher les résultats d'une recherche leboncoin directement sur une carte Google.",
-  "version": "0.2.2",
+  "description": "Affiche les résultats de vos recherches leboncoin sur une carte.",
+  "version": "0.3.0",
 
   "icons" : {
       "16": "icons/icon16.png",
@@ -13,34 +13,74 @@
     },
 
     "permissions": [
-        "https://maps.google.com/*",
-        "https://maps.googleapis.com/*"
+        "https://api.mapbox.com/*",
+        "https://api-adresse.data.gouv.fr/*",
+        "tabs"
     ],
 
-    "content_security_policy": "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com https://maps-api-ssl.google.com ; object-src 'self'",
+    "content_security_policy": "script-src 'self'; object-src 'self'",
 
     "web_accessible_resources": [
-        "shared/*",
-        "mapviewer/*",
-        "contentmodifier/html/*"
+        "lib/*",
+        "foreground/map/img/*",
+        "foreground/map/html/*",
+        "foreground/container/html/*"
     ],
 
     "background": {
         "scripts": [
-        "shared/lib/jquery-2.2.3.min.js",
-        "shared/models/geocode.js",
+        "lib/jquery-2.2.3.min.js",
+
+        "utils/logger.js",
+        "utils/extractHostFromURL.js",
+        "utils/utils.js",
+
+        "models/item.js",
+        "models/geocode.js",
+        "models/geocoded-item.js",
+
+        "interface/constants/shared-const.js",
+        "interface/constants/method-keys.js",
+
+        "background/geocodecache.js",
+        "background/geocodeapi.js",
+        "background/geocoded-item-factory.js",
+
         "background/background.js"
     ]},
 
     "content_scripts" : [{
         "matches" : ["*://*.leboncoin.fr/*"],
         "js" : [
-            "shared/lib/jquery-2.2.3.min.js",
-            "shared/models/item.js",
-            "contentmodifier/js/itemparser.js",
-            "contentmodifier/js/contentmodifier.js"
+            "lib/jquery-2.2.3.min.js",
+            "lib/mapbox-gl-v0.51.0.js",
+            "lib/mapboxgl-spiderifier.js",
+
+            "utils/logger.js",
+            "utils/extractHostFromURL.js",
+            "utils/utils.js",
+
+            "models/item.js",
+            "models/geocode.js",
+            "models/geocoded-item.js",
+
+            "interface/constants/shared-const.js",
+            "interface/constants/method-keys.js",
+
+            "interface/background-interface.js",
+            "foreground/parser/webpageparser.js",
+            "foreground/map/js/popup-factory.js",
+            "foreground/map/js/mapmanager.js",
+            "foreground/container/js/mapcontainermanager.js",
+            
+            "foreground/main/main.js"
         ],
-        "css" : [ "contentmodifier/css/contentmodifier.css"]
+        "all_frames": true,
+        "css" : [
+            "lib/mapbox-gl-v0.51.0.css",
+            "foreground/container/css/mapcontainer.css",
+            "foreground/map/css/map.css"
+        ]
     }]
 
 }
