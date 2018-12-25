@@ -148,7 +148,7 @@ class MapManager {
                 const item = marker.feature;
                 const offset = MapboxglSpiderifier.popupOffsetForSpiderLeg(marker, 36);
 
-                map.easeTo({ center: markerLngLat, offset: {x: -marker.param.x, y: -marker.param.y + 200, z: 0} });
+                map.easeTo({ center: markerLngLat, offset: {x: -marker.param.x, y: -marker.param.y + 180, z: 0} });
 
                 self.removePopup();
                 self.popup = self.makePopup(item, markerLngLat, offset, false);
@@ -197,7 +197,7 @@ class MapManager {
             const featureLngLat = {lng: featureCenter[0], lat: featureCenter[1]};
             const item = feature.properties;
 
-            map.easeTo({ center: featureLngLat, offset: {x: 0, y: 200, z: 0} });
+            map.easeTo({ center: featureLngLat, offset: {x: 0, y: 180, z: 0} });
             self.popup = self.makePopup(item, featureLngLat, 36, true);
             self.popup.addTo(map);
         });
