@@ -15,7 +15,7 @@ class WebpageParser {
     - Returns: a javascript node object if found. Null otherwise.
     */
     getPageTitleNode() {
-        var bgMain = document.querySelector(".bgMain");
+        var bgMain = document.querySelector("div.styles_title__1pDqQ");
         if (!bgMain) { return null; }
         return bgMain.querySelector("h1");
     }
@@ -26,7 +26,7 @@ class WebpageParser {
     - Returns: an array of Item objects.
     */
     parseItems() {
-        var nodes = this.document.querySelectorAll('[itemtype="http://schema.org/Offer"], [itemtype="http://schema.org/Demand"]');
+        var nodes = this.document.querySelectorAll('a[data-qa-id="aditem_container"]');
         return Array.from(nodes).map(itemFromNodes);
 
         /*
@@ -38,18 +38,18 @@ class WebpageParser {
         function itemFromNodes(node) {
             var item = new Item();
 
-            var a = node.querySelector("a");
-            item.title = a.getAttribute("title").trim();
+            var p = node.querySelector("p");
+            item.title = p.getAttribute("title").trim();
 
-            item.linkUrl = appendHost(a.getAttribute('href'));
+            item.linkUrl = appendHost(p.getAttribute('href'));
 
-            var price = node.querySelector('[itemprop="price"]');
+            var price = node.querySelector('[data-qa-id="aditem_price"] > span');
             item.price = price ? price.innerText : "";
 
-            var category = node.querySelector('[itemprop="alternateName"]');
+            var category = node.querySelector('div > div > div > div:nth-child(1) > p:nth-child(1)');
             item.category = category ? category.innerText : "";
 
-            var locNode = node.querySelector('[itemprop="availableAtOrFrom"]');
+            var locNode = node.querySelector('div > div > div > div:nth-child(1) > p:nth-child(2)');
             if (locNode) {
                 const location = locNode.innerText.replace("(pro) ", "");
                 item.location = location;
