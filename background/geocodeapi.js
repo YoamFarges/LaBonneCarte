@@ -22,7 +22,7 @@ class GeocodeAPI {
         const json = await response.json();
         const feature = json.features[0];
 
-        if (!feature) { throw new Error(`No feature was found for location "${location}"`)}
+        if (!feature) { throw new Error(`No feature was found for location "${location}. Received JSON : ${json}"`)}
 
         const coordinates = feature.geometry.coordinates;
         const longitude = coordinates[0];

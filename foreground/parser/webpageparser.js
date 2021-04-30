@@ -10,14 +10,10 @@ class WebpageParser {
     }
 
     /*
-    Retrieve the title of the page.
-
-    - Returns: a javascript node object if found. Null otherwise.
+    - Returns the document's body
     */
-    getPageTitleNode() {
-        var bgMain = document.querySelector(".bgMain");
-        if (!bgMain) { return null; }
-        return bgMain.querySelector("h1");
+    getBody() {
+        return document.body;
     }
 
     /*
@@ -26,7 +22,7 @@ class WebpageParser {
     - Returns: an array of Item objects.
     */
     parseItems() {
-        var nodes = this.document.querySelectorAll('[itemtype="http://schema.org/Offer"], [itemtype="http://schema.org/Demand"]');
+        var nodes = this.document.querySelectorAll('a[data-qa-id="aditem_container"][class*=AdCard__AdCardLink]');
         return Array.from(nodes).map(itemFromNodes);
 
         /*
@@ -36,37 +32,43 @@ class WebpageParser {
         - Returns: an Item object
         */
         function itemFromNodes(node) {
-            var item = new Item();
+            let item = new Item();
 
-            var a = node.querySelector("a");
-            item.title = a.getAttribute("title").trim();
 
-            item.linkUrl = appendHost(a.getAttribute('href'));
+            let title = node.querySelector('[data-qa-id="aditem_title"]').getAttribute("title").trim();
+            item.title = title ? title : "";
 
-            var price = node.querySelector('[itemprop="price"]');
+            item.linkUrl = appendHost(node.getAttribute('href'));
+
+            let price = node.querySelector("[class*=AdCardPrice__Amount]")
             item.price = price ? price.innerText : "";
 
-            var category = node.querySelector('[itemprop="alternateName"]');
-            item.category = category ? category.innerText : "";
 
-            var locNode = node.querySelector('[itemprop="availableAtOrFrom"]');
-            if (locNode) {
-                const location = locNode.innerText.replace("(pro) ", "");
+            let textContents = node.querySelectorAll("[class*=TextContent__TextContentWrapper]");
+            if (textContents && textContents.length >= 4) {
+                // First textContent is price and thus ignored
+
+                let category = textContents[1];
+                item.category = category ? category.innerText : "";
+
+                var location = textContents[2];
+                location = location ? location.innerText : "";
                 item.location = location;
-
-                const lastIndex = location.lastIndexOf(' ');
-                if (lastIndex) {
-                    item.city = location.substr(0, lastIndex);
-                    item.postCode = location.substr(lastIndex + 1, location.length);
+                
+                if (location) {
+                    const lastIndex = location.lastIndexOf(' ');
+                    if (lastIndex) {
+                        item.city = location.substr(0, lastIndex);
+                        item.postCode = location.substr(lastIndex + 1, location.length);
+                    }
                 }
+
+                let date = textContents[3];
+                item.date = date ? date.innerText : "";
             }
 
-            var date = node.querySelector('[itemprop="availabilityStarts"]');
-            item.date = date ? date.getAttribute("content") : "";
-
-            var img = node.querySelector("img");
-            var imgSrc = img ? img.getAttribute("src") : null;
-            item.pictureUrl = imgSrc ? imgSrc : chrome.extension.getURL('foreground/map/img/no_image.jpg');
+            // Image disabled due to LBC lazyloading preventing to retrieve images for non-visible items
+            item.pictureUrl = chrome.extension.getURL('foreground/map/img/no_image.jpg');
 
             return item;
         }

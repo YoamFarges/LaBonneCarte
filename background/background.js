@@ -37,15 +37,3 @@ chrome.runtime.onMessage.addListener(function(requestDTO, sender, sendResponse) 
 
     return false;
 });
-
-// Called when a tab is updated
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (changeInfo.status !== "complete" || extractRootDomain(tab.url) !== "leboncoin.fr") {
-        return;
-    }
-
-    const requestDTO = new RequestDTO(MethodKeys.TAB_DID_REFRESH, tabId);
-
-    log(`The leboncoin's tab with ID ${tabId} has been updated.`)
-    chrome.tabs.sendMessage(tabId, requestDTO);
-});

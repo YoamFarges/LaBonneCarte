@@ -3,95 +3,99 @@
 @white: white;
 
 #lbca_map {
-    width: 100%;
-    height: 420px;
-    background: @backgroundGrey;
+  background: @backgroundGrey;
 }
 
-  .mapboxgl-popup-content {
-    padding-bottom: 5px;
-    padding-top: 5px;
-  }
-  
-  .mapboxgl-popup-close-button {
-    background: @orange;
-    color: @white;
+.mapboxgl-popup-content {
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
 
-    &:hover {
-        background: lighten(@orange, 10%);
-    }
-  }
+.mapboxgl-popup-close-button {
+  background: @orange;
+  color: @white;
 
-  .spider-leg-container {
-    width: 1px;
-    height: 1px;
-    overflow: display;
-    will-change: transform;
+  &:hover {
+    background: lighten(@orange, 10%);
   }
-  
-  .spider-leg-container:hover { cursor: pointer }
-  
-  .spider-leg-container .spider-leg-pin {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .spider-leg-container .spider-leg-pin.default-spider-pin {
-    position: relative;
+}
 
-    margin-left: -11.5px;
-    margin-top: -34px;
+.spider-leg-container {
+  width: 1px;
+  height: 1px;
+  overflow: display;
+  will-change: transform;
+}
 
-    background-image: url('chrome-extension://__MSG_@@extension_id__/foreground/map/img/pinicon_cluster.png');
-    width: 24px;
-    height: 36px;
-    cursor: pointer;
-  }
-  
-  .spider-leg-container .spider-leg-line {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 1px;
-    background-color: #3a1310;
-    opacity: 0.4;
-    transform-origin: bottom;
-    z-index: 0;
-    height: 0;
-  }
-  
-  .spider-leg-container:hover .spider-leg-line { opacity: 1 }
-  
-  /* Animations specific styles */
-  
-  .spider-leg-container.animate {
-    -webkit-transition: margin 0.15s linear;
-    -moz-transition: margin 0.15s linear;
-    -ms-transition: margin 0.15s linear;
-    -o-transition: margin 0.15s linear;
-    transition: margin 0.15s linear;
-  }
-  
-  .spider-leg-container.initial,
-  .spider-leg-container.exit {
-    margin-left: 0 !important;
-    margin-top: 0 !important;
-    height: 0;
-  }
-  
-  .spider-leg-container.animate .spider-leg-line {
-    -webkit-transition: all 0.15s linear;
-    -moz-transition: all 0.15s linear;
-    -ms-transition: all 0.15s linear;
-    -o-transition: all 0.15s linear;
-    transition: all 0.15s linear;
-  
-    -webkit-transition-delay: inherit;
-    -moz-transition-delay: inherit;
-    -ms-transition-delay: inherit;
-    -o-transition-delay: inherit;
-    transition-delay: inherit;
-  }
-  
-  .spider-leg-container.animate.initial .spider-leg-line,
-  .spider-leg-container.animate.exit .spider-leg-line { height: 0 !important }
+.spider-leg-container:hover {
+  cursor: pointer
+}
+
+.spider-leg-container .spider-leg-pin {
+  position: relative;
+  z-index: 1;
+}
+
+.spider-leg-container .spider-leg-pin.default-spider-pin {
+  position: relative;
+
+  margin-left: -11.5px;
+  margin-top: -34px;
+
+  background-image: url('chrome-extension://__MSG_@@extension_id__/foreground/map/img/pinicon_cluster.png');
+  width: 24px;
+  height: 36px;
+  cursor: pointer;
+}
+
+.spider-leg-container .spider-leg-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background-color: #3a1310;
+  opacity: 0.4;
+  transform-origin: bottom;
+  z-index: 0;
+  height: 0;
+}
+
+.spider-leg-container:hover .spider-leg-line {
+  opacity: 1
+}
+
+/* Animations specific styles */
+
+.spider-leg-container.animate {
+  -webkit-transition: margin 0.15s linear;
+  -moz-transition: margin 0.15s linear;
+  -ms-transition: margin 0.15s linear;
+  -o-transition: margin 0.15s linear;
+  transition: margin 0.15s linear;
+}
+
+.spider-leg-container.initial,
+.spider-leg-container.exit {
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  height: 0;
+}
+
+.spider-leg-container.animate .spider-leg-line {
+  -webkit-transition: all 0.15s linear;
+  -moz-transition: all 0.15s linear;
+  -ms-transition: all 0.15s linear;
+  -o-transition: all 0.15s linear;
+  transition: all 0.15s linear;
+
+  -webkit-transition-delay: inherit;
+  -moz-transition-delay: inherit;
+  -ms-transition-delay: inherit;
+  -o-transition-delay: inherit;
+  transition-delay: inherit;
+}
+
+.spider-leg-container.animate.initial .spider-leg-line,
+.spider-leg-container.animate.exit .spider-leg-line {
+  height: 0 !important
+}

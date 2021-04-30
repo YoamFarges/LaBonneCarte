@@ -15,27 +15,8 @@ async function runApp() {
     const popupFactory = new PopupFactory(popupTemplateHTML);
     const mapManager = new MapManager(popupFactory);
     const mapContainerManager = new MapContainerManager(backgroundInterface, webpageParser, mapManager, containerHTML, isMapHidden);
-
-    async function updateItems() {
-        let items = webpageParser.parseItems();
-        log("Parse items : " + items.length + " items were found on the page.");
-        log("Please wait for geocoding...")
-        const geocodedItems = await backgroundInterface.getGeocodedItems(items);
-        log("Geocoding done ! Will update the map with " + geocodedItems.length + " geocoded items.");
-        mapManager.updateItems(geocodedItems);
-    }
-
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.method == MethodKeys.TAB_DID_REFRESH) {
-            log("Tab was refreshed. Will trigger item update if the map can be displayed on the current page.")
-            mapManager.clearItems();
-            
-            mapContainerManager
-            .addContainerToPageIfNeeded()
-            .then(updateItems)
-            .catch(e => logError(e));
-        }
-    });
+    
+    mapContainerManager.start();
 }
 
 function getHTML(url) {

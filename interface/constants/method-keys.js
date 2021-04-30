@@ -3,8 +3,6 @@ const MethodKeys = {
 
     GET_IS_MAP_HIDDEN: "getIsMapHidden",
     SET_IS_MAP_HIDDEN: "setIsMapHidden",
-
-    TAB_DID_REFRESH: "tabDidRefresh"
 };
 
 /**

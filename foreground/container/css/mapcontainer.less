@@ -1,12 +1,66 @@
 @orange: #f56b2b;
 @backgroundGrey: #e6e6e6;
-@white: white;
+
+#lbca_black_overlay {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+
+    background: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100vh;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+#lbca_bottom_left_container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 99999;
+}
+
+#lbca_map_container {
+    width: 85vw;
+    height: 80vh;
+    border-radius: 5px;
+    margin-bottom: 20px;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-content: stretch;
+    align-items: stretch;
+
+    background: @orange;
+    padding: 1px;
+}
+
+#lbca_map {
+    order: 0;
+    flex: 1 1 auto;
+    align-self: auto;
+}
+
+#lbca_warning {
+    color: #999;
+    font-style: italic;
+    font-size: .8em;
+
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 2px;
+
+    background: @backgroundGrey;
+}
 
 #lbca_button {
-    border-radius: 5px;
+    border-radius: 6px;
     transition: all 0.3s;
     padding: 10px;
-    margin-bottom: 5px;
 
     & {
         color: @orange;
@@ -14,27 +68,10 @@
         border: 1px solid @orange;
     }
 
-    &:hover {
+    &:hover,
+    &:focus {
         background: @orange;
         color: white;
         border: 1px solid white;
     }
-}
-
-.lbca_warning {
-    color: #999;
-    font-style: italic;
-    font-size: .8em;
-}
-
-#lbca_extension_container .pagination {
-    margin: 10px 0;
-}
-
-#lbca_extension_container {
-    margin-bottom: 2em;
-}
-
-.bgMain > div:first-child > div:first-child {
-    width: 100%;
 }
