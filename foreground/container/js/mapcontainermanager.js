@@ -28,8 +28,8 @@ class MapContainerManager {
         const self = this;
 
         // If the container already exists on the page, abort.
-        const button = document.getElementById("lbca_button");
-        if (button) {
+        const element = document.getElementById('lbca_button_toggle');
+        if (element) {
             return Promise.resolve();
         }
 
@@ -43,34 +43,40 @@ class MapContainerManager {
         //Store DOM references for future usage
         this.mapContainer = $('#lbca_map_container');
         this.mapContainer = $('#lbca_map_container');
-        this.button = $('#lbca_button');
+        this.toggleButton = $('#lbca_button_toggle');
+        this.refreshButton = $('#lbca_button_refresh');
         this.blackOverlay = $('#lbca_black_overlay');
+
+        self.updateToggleButtonText(this.isMapHidden);
 
         //Finish setup
         await this.mapManager.loadMap();
         if (this.isMapHidden) {
             this.mapContainer.hide();
             this.blackOverlay.hide();
+            this.refreshButton.hide();
         }
 
-        self.updateButtonText(this.isMapHidden);
-        self.button.click(handleClick);
+        self.toggleButton.click(debug);
         self.blackOverlay.click(hideMap);
+        self.refreshButton.click(refreshMap);
 
-        function handleClick() {
-            if (self.isMapHidden) {
-                self.updateItems();
-            }
+        function refreshMap() {
+            self.updateItems();
+            self.refreshButton.blur();
+        }
 
+        function toggleMap() {
             self.blackOverlay.fadeToggle(125);
             self.mapContainer.slideToggle(125, function() {
                 var isMapHidden = self.mapContainer.is(":hidden");
                 self.isMapHidden = isMapHidden;
                 self.backgroundInterface.setIsMapHidden(isMapHidden);
-                self.updateButtonText(isMapHidden);
-                self.updateOverlay(isMapHidden);
 
-                self.button.blur();
+                self.updateToggleButtonText(isMapHidden);
+                self.refreshButton.toggle();
+
+                self.toggleButton.blur();
             });
         }
 
@@ -82,19 +88,15 @@ class MapContainerManager {
             self.mapContainer.slideToggle(125, function() {
                 self.isMapHidden = true;
                 self.backgroundInterface.setIsMapHidden(true);
-                self.updateButtonText(true);
-                self.updateOverlay(true);
+                self.updateToggleButtonText(true);
+                self.refreshButton.hide();
             });
         }
 
         return Promise.resolve();
     }
 
-    updateButtonText(isMapHidden) {
-        this.button.html(isMapHidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
-    }
-
-    updateOverlay(isMapHidden) {
-        isMapHidden ? this.blackOverlay.hide() : this.blackOverlay.show();
+    updateToggleButtonText(isMapHidden) {
+        this.toggleButton.html(isMapHidden ? 'Afficher la recherche sur la carte' : 'Masquer la carte');
     }
 }

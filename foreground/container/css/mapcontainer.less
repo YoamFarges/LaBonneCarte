@@ -1,6 +1,11 @@
 @orange: #f56b2b;
 @backgroundGrey: #e6e6e6;
 
+@leftSpacing: 20px;
+@buttonsBottomSpacing: 20px;
+@mapContainerBottomSpacing: @buttonsBottomSpacing + 50px;
+
+
 #lbca_black_overlay {
     position: fixed;
     bottom: 0px;
@@ -15,25 +20,32 @@
     }
 }
 
-#lbca_bottom_left_container {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 99999;
-}
+// #lbca_bottom_left_container {
+    // position: fixed;
+    // bottom: 20px;
+    // left: 20px;
+    // z-index: 99999;
+
+//     background: yellow;
+
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: flex-end;
+//     align-items: flex-start;
+// }
 
 #lbca_map_container {
+    position: fixed;
+    bottom: @mapContainerBottomSpacing;
+    left: @leftSpacing;
+    z-index: 99999;
+
     width: 85vw;
     height: 80vh;
     border-radius: 5px;
-    margin-bottom: 20px;
 
     display: flex;
     flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    align-content: stretch;
-    align-items: stretch;
 
     background: @orange;
     padding: 1px;
@@ -57,10 +69,22 @@
     background: @backgroundGrey;
 }
 
-#lbca_button {
+// -
+
+#lbca_buttons_container {
+    position: fixed;
+    bottom: @buttonsBottomSpacing;
+    left: @leftSpacing;
+    z-index: 99999;
+
+    display: flex;
+}
+
+.lbca_button {
     border-radius: 6px;
     transition: all 0.3s;
     padding: 10px;
+    margin-right: 10px;
 
     & {
         color: @orange;

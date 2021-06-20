@@ -9,23 +9,16 @@
 #lbca_black_overlay.hidden {
   display: none;
 }
-#lbca_bottom_left_container {
+#lbca_map_container {
   position: fixed;
-  bottom: 20px;
+  bottom: 70px;
   left: 20px;
   z-index: 99999;
-}
-#lbca_map_container {
   width: 85vw;
   height: 80vh;
   border-radius: 5px;
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-  align-content: stretch;
-  align-items: stretch;
   background: #f56b2b;
   padding: 1px;
 }
@@ -43,16 +36,24 @@
   padding-bottom: 2px;
   background: #e6e6e6;
 }
-#lbca_button {
+#lbca_buttons_container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 99999;
+  display: flex;
+}
+.lbca_button {
   border-radius: 6px;
   transition: all 0.3s;
   padding: 10px;
+  margin-right: 10px;
   color: #f56b2b;
   background: white;
   border: 1px solid #f56b2b;
 }
-#lbca_button:hover,
-#lbca_button:focus {
+.lbca_button:hover,
+.lbca_button:focus {
   background: #f56b2b;
   color: white;
   border: 1px solid white;
