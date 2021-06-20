@@ -13,6 +13,10 @@ class GeocodeAPI {
         }
 
         log(`Will retrieve "${location}" from data gouv api...`);
+
+        // wait 10 ms to prevent triggering anti-ddos chrome protection (https://www.chromium.org/throttling)
+        var dt = new Date();  while ((new Date()) - dt <= 10) { }   
+        
         return await this.retrieveGeocodeFromDataGouv(cityName, postCode);
     }
 
