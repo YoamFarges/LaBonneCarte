@@ -10,14 +10,10 @@ class WebpageParser {
     }
 
     /*
-    Retrieve the title of the page.
-
-    - Returns: a javascript node object if found. Null otherwise.
+    - Returns the document's body
     */
-    getPageTitleNode() {
-        var bgMain = document.querySelector(".bgMain");
-        if (!bgMain) { return null; }
-        return bgMain.querySelector("h1");
+    getBody() {
+        return document.body;
     }
 
     /*
@@ -26,8 +22,17 @@ class WebpageParser {
     - Returns: an array of Item objects.
     */
     parseItems() {
-        var nodes = this.document.querySelectorAll('[itemtype="http://schema.org/Offer"], [itemtype="http://schema.org/Demand"]');
-        return Array.from(nodes).map(itemFromNodes);
+        const h1 = this.document.querySelector('h1');
+        const nodes = Array.from(this.document.querySelectorAll('a[data-qa-id="aditem_container"]'));
+        log("Parsed " + nodes.length + " nodes on page.")
+
+        const filteredNodes = nodes.filter(node => h1.compareDocumentPosition(node) === Node.DOCUMENT_POSITION_FOLLOWING);
+        log("Only keep " + filteredNodes.length + " nodes by excluding the ones above the h1.");
+
+        const items = Array.from(filteredNodes).map(itemFromNode).filter(e => e != null);
+        log("Transformed nodes into " + items.length + " items.")
+
+        return items;
 
         /*
         Map a Node <li> object from the leboncoin's page to an Item object usable
@@ -35,38 +40,47 @@ class WebpageParser {
 
         - Returns: an Item object
         */
-        function itemFromNodes(node) {
-            var item = new Item();
+        function itemFromNode(node) {
+            let item = new Item();
 
-            var a = node.querySelector("a");
-            item.title = a.getAttribute("title").trim();
+            // Find title
+            let title = node.querySelector('[data-qa-id="aditem_title"]').getAttribute("title").trim();
+            item.title = title ? title : "";
 
-            item.linkUrl = appendHost(a.getAttribute('href'));
+            // Find link
+            item.linkUrl = appendHost(node.getAttribute('href'));
 
-            var price = node.querySelector('[itemprop="price"]');
+            // Find price
+            let price = node.querySelector('[data-qa-id="aditem_price"]');
             item.price = price ? price.innerText : "";
 
-            var category = node.querySelector('[itemprop="alternateName"]');
-            item.category = category ? category.innerText : "";
+            // Find all relevant innerTexts of the node
+            let texts = Array
+                .from(node.querySelectorAll("div, p, span"))
+                .filter(e => e.querySelectorAll("div, p, span").length === 0)
+                .map(e => e.innerText)
+                .filter(e => e && e.length > 3)
+                .filter(e => e != title)
 
-            var locNode = node.querySelector('[itemprop="availableAtOrFrom"]');
-            if (locNode) {
-                const location = locNode.innerText.replace("(pro) ", "");
-                item.location = location;
-
-                const lastIndex = location.lastIndexOf(' ');
-                if (lastIndex) {
-                    item.city = location.substr(0, lastIndex);
-                    item.postCode = location.substr(lastIndex + 1, location.length);
-                }
+            // Attempt to find location (mandatory)
+            const locationRegex = new RegExp("^.* [0-9]{5}$");
+            let location = texts.find(value => locationRegex.exec(value));
+            if (!location) {
+                return null;
             }
+            item.location = location;
+            const locationSplit = location.split(' ');
+            item.postCode = locationSplit[locationSplit.length - 1];
+            locationSplit.pop();
+            item.city = locationSplit.join(' ');
 
-            var date = node.querySelector('[itemprop="availabilityStarts"]');
-            item.date = date ? date.getAttribute("content") : "";
+            // Attempt to find date
+            const timeRegex = new RegExp("^.* [0-9]{2}:[0-9]{2}$");
+            let date = texts.find(value => timeRegex.exec(value));
+            item.date = date ? date : "";
 
-            var img = node.querySelector("img");
-            var imgSrc = img ? img.getAttribute("src") : null;
-            item.pictureUrl = imgSrc ? imgSrc : chrome.extension.getURL('foreground/map/img/no_image.jpg');
+
+            item.pictureUrl = null;
 
             return item;
         }
@@ -87,5 +101,24 @@ class WebpageParser {
 
             return null;
         }
+    }
+
+    static getImagesFromHtml(html) {
+        const imgRex = /<img.*?src="(.*?)"[^>]+>/g;
+        const images = [];
+        let img;
+        while ((img = imgRex.exec(html))) {
+            images.push(img[1]);
+        }
+        return images;
+    }
+
+    static getSmallAdImageFromHtml(html) {
+        //Regex to match following format https://img.leboncoin.fr/api/v1/lbcpb1/images/7e/bc/86/7ebc86a938109e279a3430427184d5bcdc4b2f19.jpg?rule=ad-thumb
+        const regex = new RegExp("^.*img\.leboncoin\.fr\/api.*[jpg,png].*rule=ad-thumb");
+        const images = this.getImagesFromHtml(html);
+        const image = images.find(value => regex.exec(value));
+        if (!image) { return null; }
+        return image.replace("rule=ad-thumb", "rule=ad-small");
     }
 }

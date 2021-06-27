@@ -13,6 +13,7 @@ class GeocodedItemFactory {
         const results = await Promise.all(promises.map(p => p.catch(err => { 
             console.log(err);
         } )));
+
         return results.filter(r => !!r);
     }
 }

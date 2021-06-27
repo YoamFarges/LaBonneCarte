@@ -6,6 +6,8 @@ class MapManager {
         this.franceBounds = { center: [2.6025, 46.34], zoom: 4.5 }
         this.iconImgURL = chrome.extension.getURL('foreground/map/img/pinicon.png');
         this.popup = null;
+
+        this.imageCache = new AdImageCache();
     }
 
     loadMap() {
@@ -153,6 +155,7 @@ class MapManager {
                 self.removePopup();
                 self.popup = self.makePopup(item, markerLngLat, offset, false);
                 self.popup.addTo(map);
+                self.loadPopupImage(item);
                 
                 self.popup.on('close', function(e) {
                     self.popup = null;
@@ -200,6 +203,7 @@ class MapManager {
             map.easeTo({ center: featureLngLat, offset: {x: 0, y: 180, z: 0} });
             self.popup = self.makePopup(item, featureLngLat, 36, true);
             self.popup.addTo(map);
+            self.loadPopupImage(item);
         });
 
         map.on('click', 'cluster-pins', function(e) {
@@ -253,5 +257,37 @@ class MapManager {
         popup.setHTML(popupHTML)
 
         return popup;
+    }
+    
+    async loadPopupImage(item) {
+        if (item.pictureUrl && item.pictureUrl != "null") { return; }
+        let newItem = await this.loadImagesForItem(item);
+        const popupHTML = this.popupFactory.htmlForItem(newItem);
+        this.popup.setHTML(popupHTML);
+    }
+
+    async loadImagesForItem(item) {
+        const adUrl = item.linkUrl;
+        const imageUrl = this.imageCache.imageUrlWithAdUrl(adUrl);
+        if (imageUrl) { 
+            item.pictureUrl = imageUrl;
+            return item;
+        }
+
+        const imageCache = this.imageCache;
+        return await fetch(item.linkUrl)
+        .then(response => response.text())
+        .then(html => WebpageParser.getSmallAdImageFromHtml(html))
+        .then((imageUrl) => {
+            if (imageUrl) { 
+                item.pictureUrl = imageUrl;
+                imageCache.cacheImage(item.linkUrl, imageUrl);
+            }
+            return item;
+        })
+        .catch(err => {
+            logError('Impossible to fetch ' + item.linkUrl, err);
+            return item;
+        });
     }
 }

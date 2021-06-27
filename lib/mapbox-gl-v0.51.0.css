@@ -415,6 +415,7 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
     border-radius: 0 3px 0 0;
     cursor: pointer;
     background-color: transparent;
+    width: 20px;
 }
 
 .mapboxgl-popup-close-button:hover {
