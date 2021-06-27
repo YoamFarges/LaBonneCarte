@@ -247,8 +247,6 @@ class MapManager {
     }
 
     makePopup(item, lngLat, popupOffset, closeOnClick) {
-        log("Make popup for itme " + JSON.stringify(item));
-
         const popupHTML = this.popupFactory.htmlForItem(item);
         const popup = new mapboxgl.Popup({
             closeOnClick: closeOnClick,

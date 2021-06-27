@@ -15,26 +15,29 @@ class GeocodeAPI {
         }
 
         const geocode = this.retrieveGeocodeFromGlobalCommunes(cityName, postCode);
+        log("Geocode for location " + location + " is  " + JSON.stringify(geocode));
+        
         return geocode;
     }
 
     retrieveGeocodeFromGlobalCommunes(cityName, postCode) {
         const location = this.makeLocation(cityName, postCode);
-        log(`Will retrieve Geocode from global Communes file for '${location}'`);
 
         const communesFilteredByPostCode = Commune.findAllByCodePostal(postCode, this.communes);
         if (communesFilteredByPostCode.length == 0) {
             throw new Error(`No commune was found for location "${location}".`);
         }
+
         if (communesFilteredByPostCode.length == 1) {
             return this.geocodeFromCommune(location, communesFilteredByPostCode[0]);
         } 
 
         const sanitizedCityName = this.sanitizeCityNameForCommuneComparison(cityName);
-        let commune = Commune.findFirstByCityName(sanitizedCityName, this.communes);
+        log(sanitizedCityName);
+        let commune = Commune.findFirstByCityName(sanitizedCityName, communesFilteredByPostCode);
         if (commune) { return this.geocodeFromCommune(location, commune); }
 
-        commune = Commune.findFirstByLibelleAcheminement(sanitizedCityName, this.communes);
+        commune = Commune.findFirstByLibelleAcheminement(sanitizedCityName, communesFilteredByPostCode);
         if (commune) { return this.geocodeFromCommune(location, commune); }
 
         throw new Error(`No commune was found for location "${location}".`);
@@ -48,6 +51,9 @@ class GeocodeAPI {
         .replaceAll("'", "");
         if (sanitized.startsWith("SAINT ")) { 
             sanitized = sanitized.replace("SAINT", "ST");
+        }
+        if (sanitized.startsWith("SAINTE ")) { 
+            sanitized = sanitized.replace("SAINTE", "STE");
         }
         return sanitized;
     }
