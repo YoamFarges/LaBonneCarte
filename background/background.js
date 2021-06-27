@@ -2,13 +2,13 @@
     This chrome extension background thread just helps transitioning the content page data to
     the google maps iframe in order to display the markers correctly.
 
-    It also caches the geocache data as the number of Google API call is limited.
+    It also caches the geocache data.
 */
 
 log("Loading background...");
 
 const geocodeCache = new GeocodeCache();
-var geocodeAPI = new GeocodeAPI(geocodeCache);
+var geocodeAPI = new GeocodeAPI(geocodeCache, Communes);
 var geocodedItemFactory = new GeocodedItemFactory(geocodeAPI);
 
 var isMapHidden = false;

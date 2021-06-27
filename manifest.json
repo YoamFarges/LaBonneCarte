@@ -4,7 +4,7 @@
   "name": "La Bonne Carte",
   "short_name": "LaBonneCarte",
   "description": "Affiche les résultats de vos recherches leboncoin sur une carte.",
-  "version": "0.3.0",
+  "version": "3.0.0",
 
   "icons" : {
       "16": "icons/icon16.png",
@@ -13,9 +13,7 @@
     },
 
     "permissions": [
-        "https://api.mapbox.com/*",
-        "https://api-adresse.data.gouv.fr/*",
-        "tabs"
+        "https://api.mapbox.com/*"
     ],
 
     "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -38,6 +36,7 @@
         "models/item.js",
         "models/geocode.js",
         "models/geocoded-item.js",
+        "models/communes.js",
 
         "interface/constants/shared-const.js",
         "interface/constants/method-keys.js",
@@ -50,7 +49,7 @@
     ]},
 
     "content_scripts" : [{
-        "matches" : ["*://*.leboncoin.fr/*"],
+        "matches" : ["*://*.leboncoin.fr/recherche*"],
         "js" : [
             "lib/jquery-2.2.3.min.js",
             "lib/mapbox-gl-v0.51.0.js",
@@ -70,6 +69,7 @@
             "interface/background-interface.js",
             "foreground/parser/webpageparser.js",
             "foreground/map/js/popup-factory.js",
+            "foreground/map/js/adimagecache.js",
             "foreground/map/js/mapmanager.js",
             "foreground/container/js/mapcontainermanager.js",
             

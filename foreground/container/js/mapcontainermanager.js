@@ -18,6 +18,7 @@ class MapContainerManager {
     async updateItems() {
         let items = this.webpageParser.parseItems();
         log("Parse items : " + items.length + " items were found on the page.");
+        
         log("Please wait for geocoding...")
         const geocodedItems = await this.backgroundInterface.getGeocodedItems(items);
         log("Geocoding done ! Will update the map with " + geocodedItems.length + " geocoded items.");
@@ -57,7 +58,7 @@ class MapContainerManager {
             this.refreshButton.hide();
         }
 
-        self.toggleButton.click(debug);
+        self.toggleButton.click(toggleMap);
         self.blackOverlay.click(hideMap);
         self.refreshButton.click(refreshMap);
 
