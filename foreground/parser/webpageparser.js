@@ -30,7 +30,7 @@ class WebpageParser {
         log("Only keep " + filteredNodes.length + " nodes by excluding the ones above the h1.");
 
         const items = Array.from(filteredNodes).map(itemFromNode).filter(e => e != null);
-        log("Transformed nodes into " + items.length + " items.")
+        log("Transformed " + filteredNodes.length + " nodes into " + items.length + " items.")
 
         return items;
 
@@ -41,21 +41,21 @@ class WebpageParser {
         - Returns: an Item object
         */
         function itemFromNode(node) {
-            let item = new Item();
+            const item = new Item();
 
             // Find title
-            let title = node.querySelector('[data-qa-id="aditem_title"]').getAttribute("title").trim();
+            const title = node.querySelector('[data-qa-id="aditem_title"]').getAttribute("title").trim();
             item.title = title ? title : "";
 
             // Find link
             item.linkUrl = appendHost(node.getAttribute('href'));
 
             // Find price
-            let price = node.querySelector('[data-qa-id="aditem_price"]');
+            const price = node.querySelector('[data-qa-id="aditem_price"]');
             item.price = price ? price.innerText : "";
 
             // Find all relevant innerTexts of the node
-            let texts = Array
+            const texts = Array
                 .from(node.querySelectorAll("div, p, span"))
                 .filter(e => e.querySelectorAll("div, p, span").length === 0)
                 .map(e => e.innerText)
@@ -63,22 +63,27 @@ class WebpageParser {
                 .filter(e => e != title)
 
             // Attempt to find location (mandatory)
-            const locationRegex = new RegExp("^.* [0-9]{5}$");
-            let location = texts.find(value => locationRegex.exec(value));
+            // Examples:
+            // - Paris 75001
+            // - Limoges 87000
+            // - Lyon 69005 5e arrondissement
+            const locationRegex = new RegExp("^(.* [0-9]{5})");
+            const location = texts.find(value => locationRegex.exec(value));
             if (!location) {
                 return null;
             }
             item.location = location;
-            const locationSplit = location.split(' ');
+
+            const locationFirstMatch = locationRegex.exec(location)[0]; //Capture the first pattern (i.e transforms "Lyon 69005 5e arrondissement" into "Lyon 69005")
+            const locationSplit = locationFirstMatch.split(' ');
             item.postCode = locationSplit[locationSplit.length - 1];
             locationSplit.pop();
             item.city = locationSplit.join(' ');
 
             // Attempt to find date
             const timeRegex = new RegExp("^.* [0-9]{2}:[0-9]{2}$");
-            let date = texts.find(value => timeRegex.exec(value));
+            const date = texts.find(value => timeRegex.exec(value));
             item.date = date ? date : "";
-
 
             item.pictureUrl = null;
 

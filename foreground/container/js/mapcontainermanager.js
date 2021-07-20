@@ -1,12 +1,12 @@
 
 
 class MapContainerManager {
-    constructor(backgroundInterface, webpageParser, mapManager, containerHTML, isMapHidden) {
+    constructor(backgroundInterface, webpageParser, mapManager, containerHTML) {
         this.webpageParser = webpageParser;
         this.backgroundInterface = backgroundInterface;
         this.mapManager = mapManager;
         this.containerHTML = containerHTML;
-        this.isMapHidden = isMapHidden;
+        this.isMapHidden = true;
     }
 
     async start() {
@@ -50,8 +50,15 @@ class MapContainerManager {
 
         self.updateToggleButtonText(this.isMapHidden);
 
+        this.mapContainer.css('visibility', 'hidden');
+        this.blackOverlay.css('visibility', 'hidden');
+        this.refreshButton.css('visibility', 'hidden');
+
         //Finish setup
         await this.mapManager.loadMap();
+        this.mapContainer.css('visibility', 'visible');
+        this.blackOverlay.css('visibility', 'visible');
+        this.refreshButton.css('visibility', 'visible');
         if (this.isMapHidden) {
             this.mapContainer.hide();
             this.blackOverlay.hide();
