@@ -1,12 +1,12 @@
 
 
 class MapContainerManager {
-    constructor(backgroundInterface, webpageParser, mapManager, containerHTML, isMapHidden) {
+    constructor(backgroundInterface, webpageParser, mapManager, containerHTML) {
         this.webpageParser = webpageParser;
         this.backgroundInterface = backgroundInterface;
         this.mapManager = mapManager;
         this.containerHTML = containerHTML;
-        this.isMapHidden = isMapHidden;
+        this.isMapHidden = true;
     }
 
     async start() {
