@@ -4,7 +4,7 @@
   "name": "La Bonne Carte",
   "short_name": "LaBonneCarte",
   "description": "Affiche les résultats de vos recherches leboncoin sur une carte.",
-  "version": "3.0.1",
+  "version": "3.0.2",
 
   "icons" : {
       "16": "icons/icon16.png",
