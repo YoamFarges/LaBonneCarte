@@ -14,8 +14,7 @@
   bottom: 70px;
   left: 20px;
   z-index: 99999;
-  width: 85vw;
-  height: 80vh;
+  width: calc(100% - 40px);
   border-radius: 5px;
   display: flex;
   flex-direction: column;
