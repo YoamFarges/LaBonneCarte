@@ -1,6 +1,10 @@
-import cssText from "data-text:~/contents/lbca_overlay.less"
+import leafletCss from "data-text:leaflet/dist/leaflet.css"
+import lbcaCss from "data-text:~/contents/lbca_overlay.less"
 import type {PlasmoCSConfig} from "plasmo"
 import {useState} from "react"
+import {MapContainer, Marker, Popup} from 'react-leaflet'
+import {TileLayer} from 'react-leaflet'
+import {useMap} from 'react-leaflet'
 
 console.log("♥️ Bienvenue sur LaBonneCarte.")
 
@@ -11,7 +15,7 @@ export const config: PlasmoCSConfig = {
 
 export const getStyle = () => {
   const style = document.createElement("style")
-  style.textContent = cssText
+  style.textContent = leafletCss + lbcaCss;
   return style
 }
 
@@ -38,12 +42,21 @@ const LBCAOverlay = () => {
     console.log("Refresh button")
   }
 
+  const position = {lat: 46, lng: 6}
+
   return (
     <div>
       <div id="lbca_black_overlay" className={overlayClasses} onClick={hideMap}></div>
 
       <div id="lbca_map_container" className={mapContainerClasses}>
-        <div id="lbca_map"></div>
+          <MapContainer id="lbca_map" center={position} zoom={13} scrollWheelZoom={false} style={{height: 100}}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+      
+          </MapContainer>
+
         <div id="lbca_warning">Certaines annonces peuvent ne pas avoir été affichées correctement sur la carte. La
           position des annonces est approximative.</div>
       </div>
