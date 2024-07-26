@@ -1,0 +1,135 @@
+@orange: #f56b2b;
+@backgroundGrey: #e6e6e6;
+
+@spacing: 16px;
+
+@leftSpacing: @spacing;
+@buttonsBottomSpacing: @spacing;
+@buttonHeight:44px;
+@mapContainerBottomSpacing: @buttonsBottomSpacing + @buttonHeight + @spacing;
+
+@mapCornerRadius: 4px;
+
+
+#lbca_black_overlay {
+    cursor: pointer;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+
+    background: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100vh;
+}
+
+#lbca_map_container {
+    position: fixed;
+    bottom: @mapContainerBottomSpacing;
+    left: @leftSpacing;
+    z-index: 99999;
+
+    width: 85vw;
+    height: 80vh;
+    border-radius: @mapCornerRadius;
+
+    display: flex;
+    flex-direction: column;
+
+    background: @orange;
+
+    transform: translateY(0);
+}
+
+#lbca_map {
+    order: 0;
+    flex: 1 1 auto;
+    align-self: auto;
+}
+
+#lbca_warning {
+    color: #999;
+    font-style: italic;
+    font-size: 10px;
+
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    background: @backgroundGrey;
+    border-bottom-left-radius: @mapCornerRadius;
+    border-bottom-right-radius: @mapCornerRadius;
+}
+
+// -
+
+#lbca_buttons_container {
+    position: fixed;
+    bottom: @buttonsBottomSpacing;
+    left: @leftSpacing;
+    z-index: 99999;
+
+    display: flex;
+}
+
+.lbca_button {
+    border-radius: 16px;
+    transition: background 0.3s, color 0.3s, border 0.3s,;
+    padding-left: @spacing;
+    padding-right: @spacing;
+
+    margin-right: @spacing;
+    font-weight: bold;
+    font-size: 14px;
+    height: @buttonHeight;
+
+    & {
+        color: @orange;
+        background: white;
+        border: 2px solid @orange;
+    }
+
+    &:hover,
+    &:focus {
+        cursor: pointer;
+        background: @orange;
+        color: white;
+        border: 2px solid white;
+    }
+}
+
+// -
+
+.visible {
+    visibility: visible;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+@fadeDuration: 150ms;
+
+.visible.fade {
+    opacity: 1;
+    transition: opacity @fadeDuration linear;
+}
+
+.hidden.fade {
+    opacity: 0;
+    transition: visibility 0s @fadeDuration, opacity @fadeDuration linear;
+}
+
+@slideDuration: 150ms;
+
+@keyframes slide-animation {
+    0% {
+      transform: translateY(100vh);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+.visible.slide {
+    animation: slide-animation @slideDuration ease-in forwards;
+}
