@@ -1,7 +1,7 @@
 import type {GeocodedItem} from "~shared/parser/item";
 import {ImageParser} from "./ImageParser";
 
-const NO_IMAGE = chrome.runtime.getURL(`assets/no_image.jpg`)
+export const NO_IMAGE = chrome.runtime.getURL(`assets/no_image.jpg`)
 
 export class ImageFetcher {
     cache = new ImageCache()

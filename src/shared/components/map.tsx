@@ -2,9 +2,11 @@ import {MapContainer, Marker, useMap} from 'react-leaflet'
 import {TileLayer} from 'react-leaflet'
 import L, {LatLngBounds, type LatLngBoundsLiteral} from 'leaflet'
 import type {GeocodedItem} from '~shared/parser/item';
-import LBCAPopup from './popup';
 import MarkerClusterGroup from 'react-leaflet-cluster'
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import ReactDOMServer from "react-dom/server";
+import LBCAPopup from './popup';
+import {ImageFetcher, NO_IMAGE} from '~shared/imagefetcher/ImageFetcher';
 
 
 const DEFAULT_CENTER = {lat: 46.34, lng: 2.6025};
@@ -28,10 +30,34 @@ const createClusterCustomIcon = function (cluster) {
     })
 }
 
+const imageFetcher = new ImageFetcher();
 interface Props {
     geocodedItems: GeocodedItem[]
 }
 export default function LBCAMap({geocodedItems}: Props) {
+    const markerRefs = useRef<Array<L.Marker<any> | null>>([])
+
+    async function onMarkerClick(index) {
+        const marker = markerRefs.current[index];
+        if (!marker) {
+            console.error("Marker not available in array of refs");
+            return;
+        }
+
+        let popupString = ReactDOMServer.renderToString(
+            <LBCAPopup item={geocodedItems[index]} imageUrl={NO_IMAGE} />
+        );
+
+        const selectedItem = geocodedItems[index];
+        marker.bindPopup(popupString).openPopup();
+
+        const imageUrl = await imageFetcher.adImageOfItem(selectedItem);
+        popupString = ReactDOMServer.renderToString(
+            <LBCAPopup item={geocodedItems[index]} imageUrl={imageUrl} />
+        );
+        marker.bindPopup(popupString).openPopup();
+    }
+
     return (
         <MapContainer id="lbca_map"
             center={DEFAULT_CENTER}
@@ -49,8 +75,14 @@ export default function LBCAMap({geocodedItems}: Props) {
                     <Marker
                         key={index}
                         position={item.coordinates}
-                        icon={PINICON}>
-                        <LBCAPopup item={item} />
+                        icon={PINICON}
+                        ref={ref => markerRefs.current[index] = ref}
+                        eventHandlers={{
+                            click: (_) => {
+                                onMarkerClick([index])
+                            }
+                        }}
+                    >
                     </Marker>
                 ))}
             </MarkerClusterGroup>
