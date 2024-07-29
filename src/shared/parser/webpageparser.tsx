@@ -72,9 +72,17 @@ function itemFromNode(node): Item | null {
     const city = locationSplit.join(' ');
 
     // Attempt to find date
+    console.log("texts :" + texts)
     const timeRegex = new RegExp("^.* [0-9]{2}:[0-9]{2}$");
     let date = texts.find(value => timeRegex.exec(value));
-    date = date ?? "";
+    if (!date) {
+        console.log("attempt to find dateRegex " + texts);
+        const dateRegex = new RegExp("^.*[0-9]{2}/[0-9]{2}/[0-9]{4}$");
+        date = texts.find(value => dateRegex.exec(value));
+    }
+    if (!date) {
+        date = "";
+    }
 
     const item: Item = {
         title: title,
