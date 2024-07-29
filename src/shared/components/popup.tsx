@@ -4,7 +4,6 @@ import {ImageFetcher} from "~shared/imagefetcher/ItemAdImageFetcher"
 import type {GeocodedItem} from "~shared/parser/item"
 
 const imageFetcher = new ImageFetcher();
-
 interface Props {
     item: GeocodedItem
 }

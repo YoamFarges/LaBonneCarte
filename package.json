@@ -39,7 +39,8 @@
       {
         "resources": [
           "assets/*.png",
-          "assets/*.jpg"
+          "assets/*.jpg",
+          "assets/*.svg"
         ],
         "matches": [
           "*://*.leboncoin.fr/*",

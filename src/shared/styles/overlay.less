@@ -3,9 +3,9 @@
 
 @spacing: 16px;
 
-@leftSpacing: @spacing;
-@buttonsBottomSpacing: @spacing;
-@buttonHeight:44px;
+@leftSpacing: 24px;
+@buttonsBottomSpacing: 24px;
+@buttonHeight: 44px;
 @mapContainerBottomSpacing: @buttonsBottomSpacing + @buttonHeight + @spacing;
 
 @mapCornerRadius: 4px;
@@ -47,6 +47,11 @@
     height: 100%;
 }
 
+.leaflet-container {
+    border-top-left-radius: @mapCornerRadius;
+    border-top-right-radius: @mapCornerRadius;
+}
+
 #lbca_warning {
     color: #999;
     font-style: italic;
@@ -74,27 +79,30 @@
 
 .lbca_button {
     border-radius: 16px;
-    transition: background 0.3s, color 0.3s, border 0.3s,;
+    transition: background 0.3s, color 0.3s, border 0.3s, ;
     padding-left: @spacing;
     padding-right: @spacing;
 
     margin-right: @spacing;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 14px;
     height: @buttonHeight;
 
+    box-sizing: border-box;
+
     & {
-        color: @orange;
-        background: white;
+        background: @orange;
+        color: white;
         border: 2px solid @orange;
     }
 
     &:hover,
     &:focus {
         cursor: pointer;
-        background: @orange;
-        color: white;
-        border: 2px solid white;
+
+        color: @orange;
+        background: white;
+        border: 2px solid @orange;
     }
 }
 
@@ -124,12 +132,13 @@
 
 @keyframes slide-animation {
     0% {
-      transform: translateY(100vh);
+        transform: translateY(100vh);
     }
+
     100% {
-      transform: translateY(0);
+        transform: translateY(0);
     }
-  }
+}
 
 .visible.slide {
     animation: slide-animation @slideDuration ease-in forwards;

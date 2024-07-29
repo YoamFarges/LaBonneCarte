@@ -1,46 +1,44 @@
-import {MapContainer, Marker} from 'react-leaflet'
+import {MapContainer, Marker, useMap} from 'react-leaflet'
 import {TileLayer} from 'react-leaflet'
-import L from 'leaflet'
+import L, {LatLngBounds, type LatLngBoundsLiteral} from 'leaflet'
 import type {GeocodedItem} from '~shared/parser/item';
 import LBCAPopup from './popup';
-import {useRef} from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster'
+import {useEffect, useRef} from 'react';
 
 
 const DEFAULT_CENTER = {lat: 46.34, lng: 2.6025};
 const DEFAULT_ZOOM = 4.5;
+const ONE_MARKER_ZOOM = 10;
+
 const PINICON = new L.Icon({
-    iconUrl: chrome.runtime.getURL(`assets/pinicon.png`),
-    iconRetinaUrl: chrome.runtime.getURL(`assets/pinicon@2x.png`),
+    iconUrl: chrome.runtime.getURL(`assets/pinicon_v4.png`),
+    iconRetinaUrl: chrome.runtime.getURL(`assets/pinicon_v4@2x.png`),
     shadowUrl: chrome.runtime.getURL('assets/shadow.png'),
     iconSize: [23, 32],
-    popupAnchor: [-1, -31],
+    popupAnchor: [0, -31],
     iconAnchor: [11.5, 32],
-    shadowAnchor: [7, 1]
-});
-const PINICON_CLUSTER = new L.Icon({
-    iconUrl: chrome.runtime.getURL(`assets/pinicon_cluster.png`),
-    iconRetinaUrl: chrome.runtime.getURL(`assets/pinicon_cluster@2x.png`),
-    shadowUrl: chrome.runtime.getURL('assets/shadow.png'),
-    iconSize: [30, 36],
-    popupAnchor: [-1, -36],
-    iconAnchor: [15, 35],
-    shadowAnchor: [7, 1]
+    shadowAnchor: [9.5, 6]
 });
 const createClusterCustomIcon = function (cluster) {
     return L.divIcon({
-      html: `<p class="count">${cluster.getChildCount()}</p>`,
-      className: 'lbca-marker-cluster',
-      iconSize: L.point(32, 32, true),
+        html: `<p class="count">${cluster.getChildCount()}</p>`,
+        className: 'lbca-marker-cluster',
+        iconSize: L.point(32, 32, true),
     })
-  }
+}
 
 interface Props {
     geocodedItems: GeocodedItem[]
 }
 export default function LBCAMap({geocodedItems}: Props) {
     return (
-        <MapContainer id="lbca_map" center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
+        <MapContainer id="lbca_map"
+            center={DEFAULT_CENTER}
+            zoom={DEFAULT_ZOOM}
+            scrollWheelZoom={true}
+            boundsOptions={{padding: [10, 10]}}
+        >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -56,6 +54,40 @@ export default function LBCAMap({geocodedItems}: Props) {
                     </Marker>
                 ))}
             </MarkerClusterGroup>
+
+            <Bounds items={geocodedItems} />
         </MapContainer>
     )
+}
+
+interface BoundProps {
+    items: GeocodedItem[]
+}
+// Hook necessary because MapContainer.bounds is immutable.
+// https://stackoverflow.com/a/66842177
+function Bounds({items}: BoundProps) {
+    const map = useMap();
+
+    useEffect(() => {
+        if (!map) {
+            return;
+        }
+
+        if (items.length == 0) {
+            map.flyTo(DEFAULT_CENTER, DEFAULT_ZOOM);
+            return;
+        }
+
+        if (items.length == 1) {
+            map.flyTo(items[0].coordinates, ONE_MARKER_ZOOM);
+            return
+        }
+
+        const latLngBoundsLiteral: LatLngBoundsLiteral = items.map((item) => [item.coordinates.lat, item.coordinates.lng]);
+        const bounds: LatLngBounds = new LatLngBounds(latLngBoundsLiteral);
+        map.fitBounds(bounds);
+
+    }, [map, items]);
+
+    return null;
 }

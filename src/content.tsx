@@ -29,7 +29,7 @@ const LBCAOverlay = () => {
   const mapContainerClasses = isMapVisible ? "visible slide" : "hidden fade";
   const refreshButtonClasses = isMapVisible ? "visible fade" : "hidden fade";
   const overlayClasses = isMapVisible ? "visible fade" : "hidden fade";
-  const toggleButtonText = isMapVisible ? "Masquer la carte" : "Afficher la recherche sur la carte"
+  const toggleButtonText = isMapVisible ? "Masquer" : "Carte"
 
   function toggleMap() {
     setIsMapVisible(!isMapVisible);
@@ -43,26 +43,26 @@ const LBCAOverlay = () => {
     setIsMapVisible(false);
   }
 
-  function pressRefreshButton() {   
+  function pressRefreshButton() {
     parseItemsInPage()
   }
 
   function parseItemsInPage() {
     const parser = new WebpageParser(document);
-    const items:Item[] = parser.getItems();
+    const items: Item[] = parser.getItems();
     console.log(`LaBonneCarte - Did find ${items.length} items in current page`);
 
     const geocodedItems = items
-    .map((item) => {
-      const commune = Geocoder.communeOfItem(item);
-      if (!commune) { return undefined; }
-      const geocodedItem:GeocodedItem = {
-        ...item,
-        coordinates: commune.coordinates
-      }
-      return geocodedItem
-    })
-    .filter((item) => item);
+      .map((item) => {
+        const commune = Geocoder.communeOfItem(item);
+        if (!commune) {return undefined;}
+        const geocodedItem: GeocodedItem = {
+          ...item,
+          coordinates: commune.coordinates
+        }
+        return geocodedItem
+      })
+      .filter((item) => item);
 
     console.log(`LaBonneCarte - Could geocode ${geocodedItems.length} items in current page`);
 
@@ -75,7 +75,7 @@ const LBCAOverlay = () => {
 
       {isMapVisible &&
         <div id="lbca_map_container" className={mapContainerClasses}>
-          <LBCAMap geocodedItems={geocodedItems}  />
+          <LBCAMap geocodedItems={geocodedItems} />
           <div id="lbca_warning">Certaines annonces peuvent ne pas avoir été affichées correctement sur la carte. La
             position des annonces est approximative.</div>
         </div>
