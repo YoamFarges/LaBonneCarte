@@ -31,15 +31,15 @@ export default function LBCAMap({geocodedItems}: Props) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            {/* {geocodedItems.map((item) => ( */}
+            {geocodedItems.map((item) => (
                 <Marker
-                    key={geocodedItems[0].linkUrl}
-                    position={geocodedItems[0].coordinates}
+                    key={item.linkUrl}
+                    position={item.coordinates}
                     icon={PINICON}
                     ref={selectedMarkerRef}>
-                    <LBCAPopup item={geocodedItems[0]} />
+                    <LBCAPopup item={item} />
                 </Marker>
-            {/* ))} */}
+            ))}
         </MapContainer>
     )
 }
