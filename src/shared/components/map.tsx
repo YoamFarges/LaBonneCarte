@@ -9,12 +9,13 @@ import {useRef} from 'react';
 const DEFAULT_CENTER = {lat: 46.34, lng: 2.6025};
 const DEFAULT_ZOOM = 4.5;
 const PINICON = new L.Icon({
-    iconUrl: chrome.runtime.getURL(`assets/markers/pinicon.png`),
-    iconRetinaUrl: chrome.runtime.getURL(`assets/markers/pinicon.png`),
-    shadowUrl: chrome.runtime.getURL('assets/markers/marker-shadow.png'),
-    popupAnchor: [-0, -36],
-    iconSize: [24, 36],
-    iconAnchor: [12, 36],
+    iconUrl: chrome.runtime.getURL(`assets/pinicon.png`),
+    iconRetinaUrl: chrome.runtime.getURL(`assets/pinicon@2x.png`),
+    shadowUrl: chrome.runtime.getURL('assets/shadow.png'),
+    iconSize: [30, 36],
+    popupAnchor: [-1, -36],
+    iconAnchor: [15, 35],
+    shadowAnchor: [7, 1]
 });
 
 interface Props {
@@ -30,15 +31,15 @@ export default function LBCAMap({geocodedItems}: Props) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            {geocodedItems.map((item) => (
+            {/* {geocodedItems.map((item) => ( */}
                 <Marker
-                    key={item.linkUrl}
-                    position={item.coordinates}
+                    key={geocodedItems[0].linkUrl}
+                    position={geocodedItems[0].coordinates}
                     icon={PINICON}
                     ref={selectedMarkerRef}>
-                    <LBCAPopup item={item} />
+                    <LBCAPopup item={geocodedItems[0]} />
                 </Marker>
-            ))}
+            {/* ))} */}
         </MapContainer>
     )
 }

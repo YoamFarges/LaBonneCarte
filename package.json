@@ -37,8 +37,8 @@
     "web_accessible_resources": [
       {
         "resources": [
-          "assets/markers/*.png",
-          "assets/markers/*.jpg"
+          "assets/*.png",
+          "assets/*.jpg"
         ],
         "matches": [
           "*://*.leboncoin.fr/*",
