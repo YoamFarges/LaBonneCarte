@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@plasmohq/messaging": "^0.6.2",
     "leaflet": "^1.9.4",
     "plasmo": "0.88.0",
     "react": "^18.2.0",
@@ -32,6 +33,19 @@
     ],
     "permissions": [
       "scripting"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "assets/markers/*.png",
+          "assets/markers/*.jpg"
+        ],
+        "matches": [
+          "*://*.leboncoin.fr/*",
+          "*://*.piruzap.com/*",
+          "*://*.plasmo.com/*"
+        ]
+      }
     ]
   }
 }
