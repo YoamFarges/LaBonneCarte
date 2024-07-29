@@ -1,9 +1,10 @@
 import leafletCss from "data-text:leaflet/dist/leaflet.css"
 import lbcaCss from "data-text:~/shared/styles/overlay.less"
+import popupCss from "data-text:~/shared/styles/popup.less"
+
 import type {PlasmoCSConfig} from "plasmo"
 import {useState} from "react"
 import LBCAMap from "./shared/components/map"
-import {sendToContentScript} from "@plasmohq/messaging"
 import {WebpageParser} from "./shared/parser/webpageparser"
 import {Geocoder} from "~shared/geocoder/geocoder"
 import type {GeocodedItem, Item} from "~shared/parser/item"
@@ -17,7 +18,7 @@ export const config: PlasmoCSConfig = {
 
 export const getStyle = () => {
   const style = document.createElement("style")
-  style.textContent = leafletCss + lbcaCss;
+  style.textContent = leafletCss + lbcaCss + popupCss;
   return style
 }
 

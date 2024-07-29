@@ -1,7 +1,10 @@
 import {MapContainer, Marker, Popup} from 'react-leaflet'
 import {TileLayer} from 'react-leaflet'
 import L from 'leaflet'
-import type {GeocodedItem, Item} from '~shared/models/item';
+import type {GeocodedItem} from '~shared/parser/item';
+import {ImageFetcher} from '~shared/imagefetcher/ItemAdImageFetcher';
+import LBCAPopup from './popup';
+import {useRef} from 'react';
 
 const DEFAULT_CENTER = {lat: 46.34, lng: 2.6025};
 const DEFAULT_ZOOM = 4.5;
@@ -18,6 +21,8 @@ interface Props {
     geocodedItems: GeocodedItem[]
 }
 export default function LBCAMap({geocodedItems}: Props) {
+    const selectedMarkerRef = useRef(null)
+
     return (
         <MapContainer id="lbca_map" center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
             <TileLayer
@@ -26,10 +31,12 @@ export default function LBCAMap({geocodedItems}: Props) {
             />
 
             {geocodedItems.map((item) => (
-                <Marker key={item.linkUrl} position={item.coordinates} icon={PINICON}>
-                    <Popup>
-                        A pretty CSS3 popup. <br /> Easily customizable.
-                    </Popup>
+                <Marker
+                    key={item.linkUrl}
+                    position={item.coordinates}
+                    icon={PINICON}
+                    ref={selectedMarkerRef}>
+                    <LBCAPopup item={item} />
                 </Marker>
             ))}
         </MapContainer>
