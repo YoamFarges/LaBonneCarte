@@ -13,9 +13,9 @@ const PINICON = new L.Icon({
     iconUrl: chrome.runtime.getURL(`assets/pinicon.png`),
     iconRetinaUrl: chrome.runtime.getURL(`assets/pinicon@2x.png`),
     shadowUrl: chrome.runtime.getURL('assets/shadow.png'),
-    iconSize: [30, 36],
-    popupAnchor: [-1, -36],
-    iconAnchor: [15, 35],
+    iconSize: [23, 32],
+    popupAnchor: [-1, -31],
+    iconAnchor: [11.5, 32],
     shadowAnchor: [7, 1]
 });
 const PINICON_CLUSTER = new L.Icon({
