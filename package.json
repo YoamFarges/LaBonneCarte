@@ -1,7 +1,7 @@
 {
   "name": "labonnecarte",
   "displayName": "Labonnecarte",
-  "version": "0.0.1",
+  "version": "4.0.0",
   "description": "Affiche les résultats de vos recherches leboncoin sur une carte.",
   "author": "Yoam Farges <yoam.farges@gmail.com>",
   "scripts": {

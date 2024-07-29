@@ -8,7 +8,6 @@ import ReactDOMServer from "react-dom/server";
 import LBCAPopup from './popup';
 import {ImageFetcher, NO_IMAGE} from '~shared/imagefetcher/ImageFetcher';
 
-
 const DEFAULT_CENTER = {lat: 46.34, lng: 2.6025};
 const DEFAULT_ZOOM = 4.5;
 const ONE_MARKER_ZOOM = 10;

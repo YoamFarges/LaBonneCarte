@@ -1,6 +1,6 @@
 import leafletCss from "data-text:leaflet/dist/leaflet.css"
-import lbcaCss from "data-text:~/shared/styles/overlay.less"
-import popupCss from "data-text:~/shared/styles/popup.less"
+import lbcaCss from "data-text:~/shared/styles/lbca.less"
+import popupCss from "data-text:~/shared/styles/map_popup.less"
 
 import type {PlasmoCSConfig} from "plasmo"
 import {useState} from "react"
