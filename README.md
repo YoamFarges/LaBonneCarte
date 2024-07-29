@@ -1,33 +1,31 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# LaBonneCarte
+_A published [**chrome extension**](https://chrome.google.com/webstore/detail/la-bonne-carte/oegacpncaonolgbpmphcimodilfoacnl) to display leboncoin's (sort of french craigslist) search results on a map._
 
-## Getting Started
+Leboncoin is the main website to buy and sell stuff in France, but for some reason, there is no way to display the results of your search directly on a map. This simple extension aims at fixing that.
 
-First, run the development server:
+![Screenshot of LaBonneCarte in action](https://i.imgur.com/teRI705.jpeg)
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+### Disclaimer
+- I am not affiliated at all with leboncoin.
+- Some sentences of the extension are in french only as the target website is french only.
+- The code is just a fun project for me, in order to learn how to make Chrome extensions. It is not in a clean production state, has some known drawbacks, some magic numbers, and has no tests. All PRs are welcome.
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+### Stack
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+#### Plasmo
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+The extension was previously made natively and was ported to https://plasmo.com/ for an easier maintenance.
 
-## Making production build
+Follow the very simple steps to the [https://docs.plasmo.com/](plasmo documentation) in order to run the project locally.
 
-Run the following:
+#### Leaflet
 
-```bash
-pnpm build
-# or
-npm run build
-```
+For the map feature, this project extensively uses [https://leafletjs.com/](Leaflet) and [https://react-leaflet.js.org/](react-leaflet).
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+#### Geocoding
 
-## Submit to the webstores
+To prevent browser limitation when using geocoding API from a chrome extension, the geocoding is made directly within the extension. The data comes from https://www.data.gouv.fr/fr/datasets/base-officielle-des-codes-postaux/.
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+### Licence
+
+See LICENCE.md
