@@ -43,9 +43,7 @@
           "assets/*.svg"
         ],
         "matches": [
-          "*://*.leboncoin.fr/*",
-          "*://*.piruzap.com/*",
-          "*://*.plasmo.com/*"
+          "*://*.leboncoin.fr/*"
         ]
       }
     ]

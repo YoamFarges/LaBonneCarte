@@ -12,7 +12,7 @@ import type {GeocodedItem, Item} from "~shared/parser/item"
 console.log("♥️ Bienvenue sur LaBonneCarte.")
 
 export const config: PlasmoCSConfig = {
-  matches: ["*://*.leboncoin.fr/*", "*://*.piruzap.com/*", "*://*.plasmo.com/*"],
+  matches: ["*://*.leboncoin.fr/*"],
   all_frames: true
 }
 
