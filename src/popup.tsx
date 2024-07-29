@@ -10,7 +10,7 @@ const LBCAPopup = () => {
             <p>Affiche les résultats de vos recherches Leboncoin directement sur une carte.</p>
             <h3>Comment ça marche ?</h3>
             <ul>
-                <li>Après avoir activé l'extension, un bouton apparaitra en bas à gauche de votre écran sur leboncoin.fr</li>
+                <li>Après avoir activé l'extension, <strong>un bouton apparaitra en bas à gauche</strong> de votre écran sur leboncoin.fr</li>
                 <li>La carte permet uniquement d'afficher les résultats <strong>de la page actuelle</strong> sous forme de marqueurs.</li>
                 <li>Les marqueurs sont groupés par code postal. Leboncoin ne donne malheureusement pas d'information sur une adresse plus précise que cela.</li>
             </ul>
