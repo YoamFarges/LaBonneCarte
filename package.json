@@ -1,0 +1,53 @@
+{
+  "name": "labonnecarte",
+  "displayName": "Labonnecarte",
+  "version": "4.0.0",
+  "description": "Affiche les résultats de vos recherches leboncoin sur une carte.",
+  "author": "Yoam Farges <yoam.farges@gmail.com>",
+  "scripts": {
+    "dev": "plasmo dev",
+    "dev:firefox": "plasmo dev --target=firefox-mv2",
+    "dev:safari": "plasmo dev --target=safari-mv3",
+    "build": "plasmo build",
+    "build:firefox": "plasmo build --target=firefox-mv2",
+    "build:safari": "plasmo build --target=safari-mv3",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "@plasmohq/messaging": "^0.6.2",
+    "leaflet": "^1.9.4",
+    "plasmo": "0.88.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-cluster": "^2.1.0"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.1.1",
+    "@types/chrome": "0.0.258",
+    "@types/leaflet": "^1.9.12",
+    "@types/node": "20.11.5",
+    "@types/react": "18.2.48",
+    "@types/react-dom": "18.2.18",
+    "prettier": "3.2.4",
+    "typescript": "5.3.3"
+  },
+  "manifest": {
+    "host_permissions": [
+      "*://*.leboncoin.fr/*"
+    ],
+    "permissions": [],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "assets/*.png",
+          "assets/*.jpg",
+          "assets/*.svg"
+        ],
+        "matches": [
+          "*://*.leboncoin.fr/*"
+        ]
+      }
+    ]
+  }
+}
