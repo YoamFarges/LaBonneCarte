@@ -1,9 +1,15 @@
 # LaBonneCarte
-_A published [**chrome extension**](https://chrome.google.com/webstore/detail/la-bonne-carte/oegacpncaonolgbpmphcimodilfoacnl) to display leboncoin's (sort of french craigslist) search results on a map._
+_A published extension  to display leboncoin's (sort of french craigslist) search results on a map._
+
 
 Leboncoin is the main website to buy and sell stuff in France, but for some reason, there is no way to display the results of your search directly on a map. This simple extension aims at fixing that.
 
 ![Screenshot of LaBonneCarte in action](https://i.imgur.com/teRI705.jpeg)
+
+|Browser|Store link|
+| - | - |
+| Chrome | https://chrome.google.com/webstore/detail/la-bonne-carte/oegacpncaonolgbpmphcimodilfoacnl |
+| Firefox | https://addons.mozilla.org/fr/firefox/addon/labonnecarte/ |
 
 ### Disclaimer
 - I am not affiliated at all with leboncoin.
