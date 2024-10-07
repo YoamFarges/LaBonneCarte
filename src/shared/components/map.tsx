@@ -69,7 +69,7 @@ export default function LBCAMap({geocodedItems}: Props) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIcon}>
+            <MarkerClusterGroup maxClusterRadius={0} chunkedLoading iconCreateFunction={createClusterCustomIcon}>
                 {geocodedItems.map((item, index) => (
                     <Marker
                         key={index}
@@ -79,7 +79,7 @@ export default function LBCAMap({geocodedItems}: Props) {
                         eventHandlers={{
                             click: (_) => {
                                 onMarkerClick([index])
-                            }
+                            }  
                         }}
                     >
                     </Marker>
