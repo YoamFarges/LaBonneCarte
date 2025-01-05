@@ -52,19 +52,35 @@
     border-top-right-radius: @mapCornerRadius;
 }
 
-#lbca_warning {
-    color: #999;
+#lbca_disclaimer {
+    font-size: 12px;
+    background: @backgroundGrey;
     font-style: italic;
-    font-size: 10px;
+    color: #535353;
 
     padding-left: 10px;
     padding-top: 5px;
     padding-bottom: 5px;
 
-    background: @backgroundGrey;
     border-bottom-left-radius: @mapCornerRadius;
     border-bottom-right-radius: @mapCornerRadius;
+
+    &.lbca_disclaimer_no_items {
+        color: white;
+        background: @orange;
+
+        a {
+            color: white;
+        }
+    }
+
+    .title {
+        font-style: normal;
+        font-weight: bold;
+    }
 }
+
+
 
 // -
 
