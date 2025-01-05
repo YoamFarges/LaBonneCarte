@@ -16,7 +16,7 @@
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
     "leaflet": "^1.9.4",
-    "plasmo": "0.88.0",
+    "plasmo": "^0.89.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
