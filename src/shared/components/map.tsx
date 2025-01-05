@@ -1,14 +1,14 @@
-import {MapContainer, Marker, useMap} from 'react-leaflet'
-import {TileLayer} from 'react-leaflet'
-import L, {LatLngBounds, type LatLngBoundsLiteral} from 'leaflet'
-import type {GeocodedItem} from '~shared/parser/item';
+import { MapContainer, Marker, useMap } from 'react-leaflet'
+import { TileLayer } from 'react-leaflet'
+import L, { LatLngBounds, type LatLngBoundsLiteral } from 'leaflet'
+import type { GeocodedItem } from '~shared/parser/item';
 import MarkerClusterGroup from 'react-leaflet-cluster'
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactDOMServer from "react-dom/server";
 import LBCAPopup from './popup';
-import {ImageFetcher, NO_IMAGE} from '~shared/imagefetcher/ImageFetcher';
+import { ImageFetcher, NO_IMAGE } from '~shared/imagefetcher/ImageFetcher';
 
-const DEFAULT_CENTER = {lat: 46.34, lng: 2.6025};
+const DEFAULT_CENTER = { lat: 46.34, lng: 2.6025 };
 const DEFAULT_ZOOM = 4.5;
 const ONE_MARKER_ZOOM = 10;
 
@@ -33,7 +33,7 @@ const imageFetcher = new ImageFetcher();
 interface Props {
     geocodedItems: GeocodedItem[]
 }
-export default function LBCAMap({geocodedItems}: Props) {
+export default function LBCAMap({ geocodedItems }: Props) {
     const markerRefs = useRef<Array<L.Marker<any> | null>>([])
 
     async function onMarkerClick(index) {
@@ -62,7 +62,7 @@ export default function LBCAMap({geocodedItems}: Props) {
             center={DEFAULT_CENTER}
             zoom={DEFAULT_ZOOM}
             scrollWheelZoom={true}
-            boundsOptions={{padding: [10, 10]}}
+            boundsOptions={{ padding: [10, 10] }}
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -79,7 +79,7 @@ export default function LBCAMap({geocodedItems}: Props) {
                         eventHandlers={{
                             click: (_) => {
                                 onMarkerClick([index])
-                            }  
+                            }
                         }}
                     >
                     </Marker>
@@ -96,7 +96,7 @@ interface BoundProps {
 }
 // Hook necessary because MapContainer.bounds is immutable.
 // https://stackoverflow.com/a/66842177
-function Bounds({items}: BoundProps) {
+function Bounds({ items }: BoundProps) {
     const map = useMap();
 
     useEffect(() => {

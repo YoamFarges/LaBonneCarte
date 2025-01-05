@@ -2,12 +2,13 @@ import leafletCss from "data-text:leaflet/dist/leaflet.css"
 import lbcaCss from "data-text:~/shared/styles/lbca.less"
 import popupCss from "data-text:~/shared/styles/map_popup.less"
 
-import type {PlasmoCSConfig} from "plasmo"
-import {useState} from "react"
+import type { PlasmoCSConfig } from "plasmo"
+import { useState } from "react"
 import LBCAMap from "./shared/components/map"
-import {WebpageParser} from "./shared/parser/webpageparser"
-import {Geocoder} from "~shared/geocoder/geocoder"
-import type {GeocodedItem, Item} from "~shared/parser/item"
+import { WebpageParser } from "./shared/parser/webpageparser"
+import { Geocoder } from "~shared/geocoder/geocoder"
+import type { GeocodedItem, Item } from "~shared/parser/item"
+import DisclaimerMessage from "~shared/components/disclaimermessage"
 
 console.log("♥️ Bienvenue sur LaBonneCarte.")
 
@@ -55,7 +56,7 @@ const LBCAOverlay = () => {
     const geocodedItems = items
       .map((item) => {
         const commune = Geocoder.communeOfItem(item);
-        if (!commune) {return undefined;}
+        if (!commune) { return undefined; }
         const geocodedItem: GeocodedItem = {
           ...item,
           coordinates: {
@@ -79,9 +80,9 @@ const LBCAOverlay = () => {
       {isMapVisible &&
         <div id="lbca_map_container" className={mapContainerClasses}>
           <LBCAMap geocodedItems={geocodedItems} />
-          <div id="lbca_warning">Certaines annonces peuvent ne pas avoir été affichées correctement sur la carte. La
-            position des annonces est approximative.</div>
+          <DisclaimerMessage geocodedItems={geocodedItems} />
         </div>
+
       }
       <div id="lbca_buttons_container">
         <button id="lbca_button_toggle" className="lbca_button"
