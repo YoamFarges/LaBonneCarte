@@ -14,7 +14,7 @@ export class WebpageParser {
             return []
         }
         
-        const nodes = Array.from(this.document.querySelectorAll('a[data-qa-id="aditem_container"]'));
+        const nodes = Array.from(this.document.querySelectorAll('[data-qa-id="aditem_container"]'));
         console.log("Parsed " + nodes.length + " nodes on page.")
 
         const filteredNodes = nodes.filter(node => h1.compareDocumentPosition(node) === Node.DOCUMENT_POSITION_FOLLOWING);
@@ -36,11 +36,11 @@ export class WebpageParser {
  */
 function itemFromNode(node): Item | null {
     // Find title
-    let title = node.querySelector('[data-qa-id="aditem_title"]').getAttribute("title").trim();
+    let title = node.querySelector('[data-test-id="adcard-title"]').innerText.trim();
     title = title ?? ""
 
     // Find link
-    const linkUrl = appendHost(node.getAttribute('href'));
+    const linkUrl = appendHost(node.querySelector('[href]').getAttribute('href'));
 
     // Find price
     let price = node.querySelector('[data-qa-id="aditem_price"]');
