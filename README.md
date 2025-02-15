@@ -30,6 +30,16 @@ npm run dev:safari
 
 A folder (e.g. `chrome-mv3-dev`) will be generated on the `build` subfolder. You simply have to load the unpacked extension in your browser. See https://docs.plasmo.com/framework/workflows/dev for more information.
 
+#### Build + Release
+
+```
+npm run build
+or
+npm run build:firefox
+```
+
+Then manually upload the generated zip files from the build folder on the stores. For Firefox, it is possible that the whole source code should also be zipped and sent for review, because of their policies about minified source code.
+
 ### Stack overview
 
 #### Plasmo
