@@ -1,4 +1,4 @@
-import type {Item} from "./item";
+import type { Item } from "./item";
 
 export class WebpageParser {
     document: Document;
@@ -9,11 +9,11 @@ export class WebpageParser {
 
     getItems(): Item[] {
         const h1 = this.document.querySelector('h1');
-        if (!h1) { 
+        if (!h1) {
             console.log("Cannot find H1 in page. Abort retrieving items.");
             return []
         }
-        
+
         const nodes = Array.from(this.document.querySelectorAll('[data-qa-id="aditem_container"]'));
         console.log("Parsed " + nodes.length + " nodes on page.")
 
@@ -35,16 +35,15 @@ export class WebpageParser {
    - Returns: an Item object
  */
 function itemFromNode(node): Item | null {
-    // Find title
-    let title = node.querySelector('[data-test-id="adcard-title"]').innerText.trim();
-    title = title ?? ""
+    // Find title. Multiple selectors for different pages of leboncoin
+    let title = node.querySelector('[data-test-id="adcard-title"]')
+        ? node.querySelector('[data-qa-id="aditem_title"]')
+        : node.querySelector('h2')
+
+    title = title ? title.innerText.trim() : ""
 
     // Find link
     const linkUrl = appendHost(node.querySelector('[href]').getAttribute('href'));
-
-    // Find price
-    let price = node.querySelector('[data-qa-id="aditem_price"]');
-    price = price ? price.innerText : "";
 
     // Find all relevant innerTexts of the node        
     const texts = (Array.from(node.querySelectorAll("div, p, span")) as HTMLElement[])
@@ -52,6 +51,14 @@ function itemFromNode(node): Item | null {
         .map(e => e.innerText)
         .filter(e => e && e.length > 3)
         .filter(e => e != title)
+
+    // Find price
+    let price = node.querySelector('[data-qa-id="aditem_price"]');
+    price = price ? price.innerText : null
+    if (!price) {
+        const priceRegex = new RegExp("[0-9,'\s]*€");
+        price = texts.find(value => priceRegex.exec(value));
+    }
 
     // Attempt to find location (mandatory)
     // Examples:
