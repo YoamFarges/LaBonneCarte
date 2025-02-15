@@ -1,17 +1,16 @@
 {
   "name": "labonnecarte",
   "displayName": "Labonnecarte",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Affiche les résultats de vos recherches leboncoin sur une carte.",
   "author": "Yoam Farges <yoam.farges@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",
     "dev:firefox": "plasmo dev --target=firefox-mv2",
     "dev:safari": "plasmo dev --target=safari-mv3",
-    "build": "plasmo build",
-    "build:firefox": "plasmo build --target=firefox-mv2",
-    "build:safari": "plasmo build --target=safari-mv3",
-    "package": "plasmo package"
+    "build": "plasmo build --zip",
+    "build:firefox": "plasmo build --target=firefox-mv2 --zip",
+    "build:safari": "plasmo build --target=safari-mv3 --zip"
   },
   "dependencies": {
     "@plasmohq/messaging": "^0.6.2",
