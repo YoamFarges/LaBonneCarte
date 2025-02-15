@@ -10,7 +10,7 @@ import { Geocoder } from "~shared/geocoder/geocoder"
 import type { GeocodedItem, Item } from "~shared/parser/item"
 import DisclaimerMessage from "~shared/components/disclaimermessage"
 
-console.log("♥️ Bienvenue sur LaBonneCarte 4.2.0")
+console.log("♥️ Bienvenue sur LaBonneCarte 4.2.1")
 
 export const config: PlasmoCSConfig = {
   matches: ["*://*.leboncoin.fr/*"],
