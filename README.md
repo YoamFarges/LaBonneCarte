@@ -34,7 +34,7 @@ A folder (e.g. `chrome-mv3-dev`) will be generated on the `build` subfolder. You
 
 #### Plasmo
 
-The extension was previously made natively and was ported to https://plasmo.com/ for an easier maintenance.
+The extension uses https://plasmo.com/ for an easier maintenance.
 
 Follow the very simple steps to the [https://docs.plasmo.com/](plasmo documentation) in order to run the project locally.
 
