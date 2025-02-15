@@ -37,9 +37,8 @@ export class WebpageParser {
 function itemFromNode(node): Item | null {
     // Find title. Multiple selectors for different pages of leboncoin
     let title = node.querySelector('[data-test-id="adcard-title"]')
-        ? node.querySelector('[data-qa-id="aditem_title"]')
-        : node.querySelector('h2')
-
+    if (!title) { title = node.querySelector('[data-qa-id="aditem_title"]') }
+    if (!title) { title = node.querySelector('h2') }
     title = title ? title.innerText.trim() : ""
 
     // Find link
@@ -79,7 +78,7 @@ function itemFromNode(node): Item | null {
     const city = locationSplit.join(' ');
 
     // Attempt to find date
-    console.log("texts :" + texts)
+    console.log("texts: " + texts)
     const timeRegex = new RegExp("^.* [0-9]{2}:[0-9]{2}$");
     let date = texts.find(value => timeRegex.exec(value));
     if (!date) {
