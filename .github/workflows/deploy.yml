@@ -1,24 +1,76 @@
 name: Release and deploy
 
 # Run by hand from the Actions tab, on main, once package.json and CHANGELOG.md are up to date:
-# 1. tags the current commit with the package.json version and creates the GitHub release
+# 1. checks the store credentials (nothing is created if they are wrong),
+# 2. tags the current commit with the package.json version and creates the GitHub release
 #    (notes = the matching section of CHANGELOG.md),
-# 2. builds the zips and attaches them to the release (build.yml),
-# 3. submits them to the Chrome Web Store and Firefox Add-ons.
+# 3. builds the zips and attaches them to the release (build.yml),
+# 4. sends them to the Chrome Web Store and Firefox Add-ons.
+#
+# Store secrets (a store is skipped when its secrets are missing):
+#   CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN
+#   FIREFOX_API_KEY, FIREFOX_API_SECRET, FIREFOX_EXT_ID
 on:
   workflow_dispatch:
     inputs:
       stores:
-        description: "Submit to the browser stores"
-        type: boolean
-        default: true
+        description: "Stores: publish = upload and submit for review, draft = upload only (submit by hand in the dashboard), skip = GitHub release only"
+        type: choice
+        options: [publish, draft, skip]
+        default: publish
 
 permissions:
   contents: write
 
+env:
+  CHROME_EXT_ID: oegacpncaonolgbpmphcimodilfoacnl
+
 jobs:
+  check-stores:
+    if: github.ref == 'refs/heads/main' && inputs.stores != 'skip'
+    runs-on: ubuntu-latest
+    env:
+      CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+      CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+      CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+      FIREFOX_API_KEY: ${{ secrets.FIREFOX_API_KEY }}
+    steps:
+      - name: Check Chrome Web Store credentials
+        run: |
+          if [ -z "$CHROME_CLIENT_ID" ] || [ -z "$CHROME_CLIENT_SECRET" ] || [ -z "$CHROME_REFRESH_TOKEN" ]; then
+            if [ -z "$FIREFOX_API_KEY" ]; then
+              echo "::error::No store secrets set. Run with stores=skip or add the secrets."
+              exit 1
+            fi
+            echo "Chrome secrets not set: Chrome will be skipped."
+            exit 0
+          fi
+
+          token=$(curl -sS -X POST https://oauth2.googleapis.com/token \
+            --data-urlencode "client_id=$CHROME_CLIENT_ID" \
+            --data-urlencode "client_secret=$CHROME_CLIENT_SECRET" \
+            --data-urlencode "refresh_token=$CHROME_REFRESH_TOKEN" \
+            --data-urlencode "grant_type=refresh_token" | jq -r '.access_token // empty')
+          if [ -z "$token" ]; then
+            echo "::error::Google refused the Chrome credentials (client id / secret / refresh token)."
+            exit 1
+          fi
+          echo "::add-mask::$token"
+
+          status=$(curl -sS -o item.json -w '%{http_code}' \
+            -H "Authorization: Bearer $token" -H "x-goog-api-version: 2" \
+            "https://www.googleapis.com/chromewebstore/v1.1/items/$CHROME_EXT_ID?projection=DRAFT")
+          if [ "$status" != "200" ]; then
+            echo "::error::Chrome Web Store API answered HTTP $status for $CHROME_EXT_ID (is the Chrome Web Store API enabled, and does this Google account own the extension?)"
+            cat item.json
+            exit 1
+          fi
+          echo "Chrome Web Store access OK. Current draft: $(jq -c '{crxVersion, uploadState}' item.json)"
+
   release:
-    if: github.ref == 'refs/heads/main'
+    needs: check-stores
+    # Runs when the check passed, or was skipped because stores=skip.
+    if: always() && github.ref == 'refs/heads/main' && (needs.check-stores.result == 'success' || needs.check-stores.result == 'skipped')
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -59,13 +111,14 @@ jobs:
 
   build:
     needs: release
+    if: always() && needs.release.result == 'success'
     uses: ./.github/workflows/build.yml
     with:
       tag: ${{ needs.release.outputs.version }}
 
   stores:
     needs: [release, build]
-    if: inputs.stores
+    if: always() && needs.build.result == 'success' && inputs.stores != 'skip'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -75,9 +128,9 @@ jobs:
         run: gh release download "$V" --repo "$GITHUB_REPOSITORY" --pattern "labonnecarte-$V-*.zip" --dir build
 
       # Build the keys JSON expected by bpp (https://github.com/PlasmoHQ/bpp#usage) from one secret per value.
-      # A store is skipped when its secrets are not set.
       - name: Prepare store keys
         env:
+          UPLOAD_ONLY: ${{ inputs.stores == 'draft' }}
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
@@ -86,31 +139,29 @@ jobs:
           FIREFOX_EXT_ID: ${{ secrets.FIREFOX_EXT_ID }}
         run: |
           keys=$(jq -n \
+            --arg chromeId "$CHROME_EXT_ID" --argjson uploadOnly "$UPLOAD_ONLY" \
+            --arg chromeZip "build/labonnecarte-$V-chrome.zip" \
+            --arg firefoxZip "build/labonnecarte-$V-firefox.zip" \
+            --arg sourceZip "build/labonnecarte-$V-source.zip" \
             --arg cId "$CHROME_CLIENT_ID" --arg cSecret "$CHROME_CLIENT_SECRET" --arg cToken "$CHROME_REFRESH_TOKEN" \
             --arg fKey "$FIREFOX_API_KEY" --arg fSecret "$FIREFOX_API_SECRET" --arg fId "$FIREFOX_EXT_ID" '
             {}
             + (if $cId != "" and $cSecret != "" and $cToken != "" then
-                {chrome: {extId: "oegacpncaonolgbpmphcimodilfoacnl", clientId: $cId, clientSecret: $cSecret, refreshToken: $cToken}}
+                {chrome: {zip: $chromeZip, extId: $chromeId, clientId: $cId, clientSecret: $cSecret, refreshToken: $cToken, uploadOnly: $uploadOnly}}
                else {} end)
             + (if $fKey != "" and $fSecret != "" and $fId != "" then
-                {firefox: {extId: $fId, apiKey: $fKey, apiSecret: $fSecret}}
+                {firefox: {zip: $firefoxZip, sourceFile: $sourceZip, extId: $fId, apiKey: $fKey, apiSecret: $fSecret}}
                else {} end)')
-          if [ "$keys" = "{}" ]; then
-            echo "::error::No store secrets set (CHROME_* or FIREFOX_*)"
-            exit 1
-          fi
-          echo "Submitting to: $(echo "$keys" | jq -r 'keys | join(", ")')"
+          echo "Sending to: $(echo "$keys" | jq -r 'keys | join(", ")') (mode: ${{ inputs.stores }})"
           {
             echo "BPP_KEYS<<EOF_KEYS"
             echo "$keys"
             echo "EOF_KEYS"
           } >> "$GITHUB_ENV"
 
-      - name: Submit to browser stores
+      - name: Send to browser stores
         uses: PlasmoHQ/bpp@v3
         with:
+          # Zip paths are set per store in the keys (the source zip goes to Mozilla for review).
           keys: ${{ env.BPP_KEYS }}
-          chrome-file: build/labonnecarte-${{ needs.release.outputs.version }}-chrome.zip
-          firefox-file: build/labonnecarte-${{ needs.release.outputs.version }}-firefox.zip
-          # Unminified source code for Mozilla's review.
-          source: build/labonnecarte-${{ needs.release.outputs.version }}-source.zip
+          verbose: true
