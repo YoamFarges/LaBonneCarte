@@ -40,7 +40,7 @@ npm run build:all      # Chrome + Firefox zips in build/
 #### CI/CD
 
 - **CI** (`.github/workflows/ci.yml`): every push to `master` and every PR runs a typecheck and builds the Chrome and Firefox zips. The zips can be downloaded from the run's artifacts.
-- **Release** (`.github/workflows/release.yml`): bump `version` in `package.json`, commit, then push a matching tag:
+- **Release** (`.github/workflows/release.yml`): bump `version` in `package.json`, add a `## <version>` section to `CHANGELOG.md` (it becomes the GitHub release notes, and the release fails without it), commit, then push a matching tag:
 
   ```
   git tag v4.3.0 && git push origin v4.3.0
