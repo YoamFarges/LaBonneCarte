@@ -9,8 +9,9 @@ import { WebpageParser } from "./shared/parser/webpageparser"
 import { Geocoder } from "~shared/geocoder/geocoder"
 import type { GeocodedItem, Item } from "~shared/parser/item"
 import DisclaimerMessage from "~shared/components/disclaimermessage"
+import { debug } from "~shared/debug"
 
-console.log("♥️ Bienvenue sur LaBonneCarte 4.2.1")
+console.log(`♥️ Bienvenue sur LaBonneCarte ${chrome.runtime.getManifest().version}`)
 
 export const config: PlasmoCSConfig = {
   matches: ["*://*.leboncoin.fr/*"],
@@ -48,27 +49,47 @@ const LBCAOverlay = () => {
     parseItemsInPage()
   }
 
-  function parseItemsInPage() {
+  async function parseItemsInPage() {
     const parser = new WebpageParser(document);
-    const items: Item[] = parser.getItems();
+    const items: Item[] = await parser.getItems();
     console.log(`LaBonneCarte - Did find ${items.length} items in current page`);
 
+    debug.group("Geocoding");
+    const report: object[] = [];
     const geocodedItems = items
       .map((item) => {
-        const commune = Geocoder.communeOfItem(item);
-        if (!commune) { return undefined; }
+        const row = (status: string, extra: object = {}) => report.push({
+          status, title: item.title.slice(0, 40), city: item.city, postCode: item.postCode, ...extra
+        });
+
+        if (item.coordinates) {
+          row("OK: embedded coordinates", { lat: item.coordinates.lat, lng: item.coordinates.lng });
+          return item as GeocodedItem;
+        }
+
+        const result = Geocoder.geocode(item);
+        const candidates = result.candidates.map((c) => `${c.n} / ${c.l}`).join(", ");
+        if (!result.commune) {
+          row(`FAILED: ${result.reason}`, { candidates });
+          debug.warn(`Geocoding failed for "${item.title}": ${result.reason}`, { item, candidates: result.candidates });
+          return undefined;
+        }
+
+        row(`OK: ${result.reason}`, { lat: result.commune.lt, lng: result.commune.ln, commune: result.commune.n, candidates });
         const geocodedItem: GeocodedItem = {
           ...item,
           coordinates: {
-            lat: commune.lt,
-            lng: commune.ln
+            lat: result.commune.lt,
+            lng: result.commune.ln
           }
         }
         return geocodedItem
       })
       .filter((item) => item);
+    debug.table(report);
+    debug.groupEnd();
 
-    console.log(`LaBonneCarte - Could geocode ${geocodedItems.length} items in current page`);
+    console.log(`LaBonneCarte - Could geocode ${geocodedItems.length}/${items.length} items in current page`);
 
     setGeocodedItems(geocodedItems);
   }

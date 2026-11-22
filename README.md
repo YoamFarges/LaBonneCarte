@@ -33,12 +33,22 @@ A folder (e.g. `chrome-mv3-dev`) will be generated on the `build` subfolder. You
 #### Build + Release
 
 ```
-npm run build
-or
-npm run build:firefox
+npm run typecheck
+npm run build:all      # Chrome + Firefox zips in build/
 ```
 
-Then manually upload the generated zip files from the build folder on the stores. For Firefox, it is possible that the whole source code should also be zipped and sent for review, because of their policies about minified source code.
+#### CI/CD
+
+- **CI** (`.github/workflows/ci.yml`): every push to `master` and every PR runs a typecheck and builds the Chrome and Firefox zips. The zips can be downloaded from the run's artifacts.
+- **Release** (`.github/workflows/release.yml`): bump `version` in `package.json`, commit, then push a matching tag:
+
+  ```
+  git tag v4.3.0 && git push origin v4.3.0
+  ```
+
+  This creates a GitHub release with the Chrome zip, the Firefox zip and a source zip (for Mozilla's review). If the `SUBMIT_KEYS` repository secret is set ([format](https://github.com/PlasmoHQ/bpp#usage)), the zips are also submitted to the Chrome Web Store and Firefox Add-ons. Without the secret, upload the zips from the release by hand.
+
+The version displayed in the extension comes from `package.json` (through the manifest), so it only needs to be changed there.
 
 ### Stack overview
 
