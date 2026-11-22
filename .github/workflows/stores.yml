@@ -1,0 +1,99 @@
+name: Send release to stores
+
+# Sends the zips of an existing GitHub release to the Chrome Web Store and Firefox Add-ons.
+# - Called by deploy.yml after a new release is built.
+# - Can be run by hand, e.g. to send a release to a store that was skipped.
+#
+# Secrets (a store is skipped when its secrets are missing):
+#   CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN
+#   FIREFOX_API_KEY, FIREFOX_API_SECRET, FIREFOX_EXT_ID
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
+      mode:
+        description: "publish or draft"
+        type: string
+        default: publish
+      targets:
+        description: "all, chrome or firefox"
+        type: string
+        default: all
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release to send (e.g. 4.3.0)"
+        type: string
+        required: true
+      mode:
+        description: "publish = upload and submit for review, draft = upload only"
+        type: choice
+        options: [publish, draft]
+        default: publish
+      targets:
+        description: "Stores to send to"
+        type: choice
+        options: [all, chrome, firefox]
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  stores:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      V: ${{ inputs.version }}
+      CHROME_EXT_ID: oegacpncaonolgbpmphcimodilfoacnl
+    steps:
+      - name: Download the release zips
+        run: gh release download "$V" --repo "$GITHUB_REPOSITORY" --pattern "labonnecarte-$V-*.zip" --dir build
+
+      # Build the keys JSON expected by bpp (https://github.com/PlasmoHQ/bpp#usage) from one secret per value.
+      - name: Prepare store keys
+        env:
+          UPLOAD_ONLY: ${{ inputs.mode == 'draft' }}
+          WANT_CHROME: ${{ inputs.targets == 'all' || inputs.targets == 'chrome' }}
+          WANT_FIREFOX: ${{ inputs.targets == 'all' || inputs.targets == 'firefox' }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          FIREFOX_API_KEY: ${{ secrets.FIREFOX_API_KEY }}
+          FIREFOX_API_SECRET: ${{ secrets.FIREFOX_API_SECRET }}
+          FIREFOX_EXT_ID: ${{ secrets.FIREFOX_EXT_ID }}
+        run: |
+          keys=$(jq -n \
+            --argjson wantChrome "$WANT_CHROME" --argjson wantFirefox "$WANT_FIREFOX" \
+            --arg chromeId "$CHROME_EXT_ID" --argjson uploadOnly "$UPLOAD_ONLY" \
+            --arg chromeZip "build/labonnecarte-$V-chrome.zip" \
+            --arg firefoxZip "build/labonnecarte-$V-firefox.zip" \
+            --arg sourceZip "build/labonnecarte-$V-source.zip" \
+            --arg cId "$CHROME_CLIENT_ID" --arg cSecret "$CHROME_CLIENT_SECRET" --arg cToken "$CHROME_REFRESH_TOKEN" \
+            --arg fKey "$FIREFOX_API_KEY" --arg fSecret "$FIREFOX_API_SECRET" --arg fId "$FIREFOX_EXT_ID" '
+            {}
+            + (if $wantChrome and $cId != "" and $cSecret != "" and $cToken != "" then
+                {chrome: {zip: $chromeZip, extId: $chromeId, clientId: $cId, clientSecret: $cSecret, refreshToken: $cToken, uploadOnly: $uploadOnly}}
+               else {} end)
+            + (if $wantFirefox and $fKey != "" and $fSecret != "" and $fId != "" then
+                {firefox: {zip: $firefoxZip, sourceFile: $sourceZip, extId: $fId, apiKey: $fKey, apiSecret: $fSecret}}
+               else {} end)')
+          if [ "$keys" = "{}" ]; then
+            echo "::error::Nothing to send: no secrets set for the selected store(s) (${{ inputs.targets }})."
+            exit 1
+          fi
+          echo "Sending $V to: $(echo "$keys" | jq -r 'keys | join(", ")') (mode: ${{ inputs.mode }})"
+          {
+            echo "BPP_KEYS<<EOF_KEYS"
+            echo "$keys"
+            echo "EOF_KEYS"
+          } >> "$GITHUB_ENV"
+
+      # Zip paths are set per store in the keys (the source zip goes to Mozilla for review).
+      - name: Send to browser stores
+        uses: PlasmoHQ/bpp@v3
+        with:
+          keys: ${{ env.BPP_KEYS }}
+          verbose: true

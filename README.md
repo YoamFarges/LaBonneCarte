@@ -48,6 +48,7 @@ npm run build:all      # Chrome + Firefox zips in build/
   The "Stores" option: `publish` uploads and submits for review, `draft` uploads only (submit by hand in the store dashboard), `skip` only creates the GitHub release. Before creating anything, the workflow checks that the Chrome credentials work. Store submission needs these repository secrets (a store is skipped if its secrets are missing):
   - Chrome: `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN` (OAuth client of the Google Cloud project, refresh token from `npx chrome-webstore-upload-keys`)
   - Firefox: `FIREFOX_API_KEY` (JWT issuer), `FIREFOX_API_SECRET` (JWT secret), `FIREFOX_EXT_ID` (add-on UUID)
+- **Send release to stores** (`stores.yml`): used by the deploy, and can be run by hand to send an existing release to one or both stores (e.g. a store that was skipped).
 
 The version displayed in the extension comes from `package.json` (through the manifest), so it only needs to be changed there.
 
