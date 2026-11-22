@@ -21,6 +21,9 @@ const PINICON = new L.Icon({
     iconAnchor: [11.5, 32],
     shadowAnchor: [9.5, 6]
 });
+// Same position a popup bound to a marker would have: default popup offset (0, 7) + icon popupAnchor (0, -31).
+const POPUP_OFFSET = L.point(0, 7 - 31);
+
 const createClusterCustomIcon = function (cluster) {
     return L.divIcon({
         html: `<p class="count">${cluster.getChildCount()}</p>`,
@@ -34,31 +37,42 @@ interface Props {
     geocodedItems: GeocodedItem[]
 }
 export default function LBCAMap({ geocodedItems }: Props) {
-    const markerRefs = useRef<Array<L.Marker<any> | null>>([])
+    const mapRef = useRef<L.Map | null>(null)
 
-    async function onMarkerClick(index) {
-        const marker = markerRefs.current[index];
-        if (!marker) {
-            console.error("Marker not available in array of refs");
+    /*
+       Open a standalone popup on the map rather than binding it to the marker:
+       marker.bindPopup() adds Leaflet's own click handler that toggles the popup, which
+       closed it right after we opened it on every click after the first one.
+     */
+    async function onMarkerClick(index: number) {
+        const map = mapRef.current;
+        const selectedItem = geocodedItems[index];
+        if (!map || !selectedItem) {
+            console.error("LaBonneCarte - Map or item not available for marker " + index);
             return;
         }
 
-        let popupString = ReactDOMServer.renderToString(
-            <LBCAPopup item={geocodedItems[index]} imageUrl={NO_IMAGE} />
+        const render = (imageUrl: string) => ReactDOMServer.renderToString(
+            <LBCAPopup item={selectedItem} imageUrl={imageUrl} />
         );
 
-        const selectedItem = geocodedItems[index];
-        marker.bindPopup(popupString).openPopup();
+        // openOn() closes any popup already open on the map.
+        const popup = L.popup({ offset: POPUP_OFFSET })
+            .setLatLng(selectedItem.coordinates)
+            .setContent(render(selectedItem.imageUrl ?? NO_IMAGE))
+            .openOn(map);
+        if (selectedItem.imageUrl) { return; }
 
         const imageUrl = await imageFetcher.adImageOfItem(selectedItem);
-        popupString = ReactDOMServer.renderToString(
-            <LBCAPopup item={geocodedItems[index]} imageUrl={imageUrl} />
-        );
-        marker.bindPopup(popupString).openPopup();
+        // Only update if the user did not close it or open another popup meanwhile.
+        if (popup.isOpen()) {
+            popup.setContent(render(imageUrl));
+        }
     }
 
     return (
         <MapContainer id="lbca_map"
+            ref={mapRef}
             center={DEFAULT_CENTER}
             zoom={DEFAULT_ZOOM}
             scrollWheelZoom={true}
@@ -75,10 +89,9 @@ export default function LBCAMap({ geocodedItems }: Props) {
                         key={index}
                         position={item.coordinates}
                         icon={PINICON}
-                        ref={ref => markerRefs.current[index] = ref}
                         eventHandlers={{
                             click: (_) => {
-                                onMarkerClick([index])
+                                onMarkerClick(index)
                             }
                         }}
                     >

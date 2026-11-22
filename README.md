@@ -33,12 +33,23 @@ A folder (e.g. `chrome-mv3-dev`) will be generated on the `build` subfolder. You
 #### Build + Release
 
 ```
-npm run build
-or
-npm run build:firefox
+npm run typecheck
+npm run build:all      # Chrome + Firefox zips in build/
 ```
 
-Then manually upload the generated zip files from the build folder on the stores. For Firefox, it is possible that the whole source code should also be zipped and sent for review, because of their policies about minified source code.
+#### CI/CD
+
+- **CI** (`ci.yml`): every PR runs a typecheck and builds the Chrome and Firefox zips (downloadable from the run's artifacts).
+- **Build** (`build.yml`): when a GitHub release is published, builds the Chrome zip, the Firefox zip and a source zip (for Mozilla's review) and attaches them to the release.
+- **Release and deploy** (`deploy.yml`), run by hand from the Actions tab on `main`:
+  1. bump `version` in `package.json` and add a `## <version>` section to `CHANGELOG.md`, merge to `main`;
+  2. run the workflow: it tags the commit (e.g. `4.3.0`), creates the GitHub release with the changelog section as notes, builds and attaches the zips, then submits them to the Chrome Web Store and Firefox Add-ons.
+
+  Store submission needs these repository secrets (a store is skipped if its secrets are missing). Untick "Submit to the browser stores" to only create the release.
+  - Chrome: `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN` (OAuth client of the Google Cloud project, refresh token from `npx chrome-webstore-upload-keys`)
+  - Firefox: `FIREFOX_API_KEY` (JWT issuer), `FIREFOX_API_SECRET` (JWT secret), `FIREFOX_EXT_ID` (add-on UUID)
+
+The version displayed in the extension comes from `package.json` (through the manifest), so it only needs to be changed there.
 
 ### Stack overview
 

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Parcel's worker threads crash with a segmentation fault on Linux runners (any Node version).
+  PARCEL_WORKERS: 0
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build Chrome and Firefox
+        run: npm run build:all
+
+      - name: Upload builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-builds
+          path: build/*.zip
+          retention-days: 14

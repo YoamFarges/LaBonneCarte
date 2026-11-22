@@ -1,57 +1,51 @@
-import type {GeocodedItem} from "~shared/parser/item";
-import {ImageParser} from "./ImageParser";
+import type { Item } from "~shared/parser/item";
+import { ImageParser } from "./ImageParser";
+import { debug } from "~shared/debug";
 
 export const NO_IMAGE = chrome.runtime.getURL(`assets/no_image.jpg`)
 
 export class ImageFetcher {
-    cache = new ImageCache()
+    // Key = item.linkUrl. Stores the promise so concurrent clicks share a single request.
+    private cache = new Map<string, Promise<string>>();
 
-    async adImageOfItem(item:GeocodedItem) : Promise<string> {
-        console.log("ImageFetcher - Get image for " + item.title);
-
-        let imageUrl = this.cache.getImageUrl(item);
-        if (imageUrl) { 
-            console.log("ImageFetcher - Image was already cached : " + imageUrl);
-            return imageUrl;
+    adImageOfItem(item: Item): Promise<string> {
+        // Best case: the image was already found in the search page, no network needed.
+        if (item.imageUrl) {
+            debug.log(`Image for "${item.title}" taken from the search page:`, item.imageUrl);
+            return Promise.resolve(item.imageUrl);
         }
-        
-       imageUrl = await fetch(item.linkUrl)
-        .then(response => response.text())
-        .then(html => ImageParser.getSmallAdImageFromHtml(html))
-        .then((imageUrl) => {
-            if (!imageUrl) {
-                console.log("ImageFetcher - Image was not found after fetching HTML " + item.linkUrl);
+        debug.log(`No image in search page for "${item.title}", fetching ${item.linkUrl}`);
 
+        let pending = this.cache.get(item.linkUrl);
+        if (!pending) {
+            pending = this.fetchImage(item);
+            this.cache.set(item.linkUrl, pending);
+        }
+        return pending;
+    }
+
+    private async fetchImage(item: Item): Promise<string> {
+        try {
+            const response = await fetch(item.linkUrl, { credentials: "include" });
+            const html = await response.text();
+
+            if (!response.ok || ImageParser.isBotChallenge(html)) {
+                console.warn(`LaBonneCarte - Ad page blocked or unavailable (HTTP ${response.status}): ${item.linkUrl}`);
+                // Don't cache failures: a later attempt may succeed.
+                this.cache.delete(item.linkUrl);
                 return NO_IMAGE;
             }
 
-            this.cache.cacheImageUrl(item, imageUrl);
+            const imageUrl = ImageParser.getAdImageFromHtml(html, item.linkUrl);
+            if (!imageUrl) {
+                console.log("LaBonneCarte - No image found in " + item.linkUrl);
+                return NO_IMAGE;
+            }
             return imageUrl;
-        })
-        .catch(err => {
-            console.error('LaBonneCarte - Impossible to fetch ' + item.linkUrl, err);
+        } catch (err) {
+            console.error("LaBonneCarte - Impossible to fetch " + item.linkUrl, err);
+            this.cache.delete(item.linkUrl);
             return NO_IMAGE;
-        });
-
-        return imageUrl;
-    }
-}
-
-
-/*
-Basic cache to prevent re-fetching a LBC page if it was already done before.
-*/
-class ImageCache {
-    // Key = item.linkUrl, Value = img url 
-    imageUrlsMap = new Map<string, string>();
-
-    getImageUrl(item:GeocodedItem): string | undefined {
-        let imgUrl = this.imageUrlsMap.get(item.linkUrl);
-        if (imgUrl === undefined) { return null; }
-        return imgUrl;
-    }
-
-    cacheImageUrl(item:GeocodedItem, imgUrl : string): void {
-        this.imageUrlsMap.set(item.linkUrl, imgUrl);
+        }
     }
 }
