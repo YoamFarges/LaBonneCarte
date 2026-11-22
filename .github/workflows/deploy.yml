@@ -81,3 +81,5 @@ jobs:
           keys: ${{ secrets.SUBMIT_KEYS }}
           chrome-file: build/labonnecarte-${{ needs.release.outputs.version }}-chrome.zip
           firefox-file: build/labonnecarte-${{ needs.release.outputs.version }}-firefox.zip
+          # Unminified source code for Mozilla's review.
+          source: build/labonnecarte-${{ needs.release.outputs.version }}-source.zip
