@@ -22,6 +22,8 @@ jobs:
     env:
       TAG: ${{ inputs.tag || github.event.release.tag_name }}
       GH_TOKEN: ${{ github.token }}
+      # Parcel's worker threads crash with a segmentation fault on Linux runners (any Node version).
+      PARCEL_WORKERS: 0
     steps:
       - uses: actions/checkout@v4
         with:
