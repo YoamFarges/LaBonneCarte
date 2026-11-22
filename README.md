@@ -39,14 +39,13 @@ npm run build:all      # Chrome + Firefox zips in build/
 
 #### CI/CD
 
-- **CI** (`.github/workflows/ci.yml`): every push to `master` and every PR runs a typecheck and builds the Chrome and Firefox zips. The zips can be downloaded from the run's artifacts.
-- **Release** (`.github/workflows/release.yml`): bump `version` in `package.json`, add a `## <version>` section to `CHANGELOG.md` (it becomes the GitHub release notes, and the release fails without it), commit, then push a matching tag:
+- **CI** (`ci.yml`): every PR runs a typecheck and builds the Chrome and Firefox zips (downloadable from the run's artifacts).
+- **Build** (`build.yml`): when a GitHub release is published, builds the Chrome zip, the Firefox zip and a source zip (for Mozilla's review) and attaches them to the release.
+- **Release and deploy** (`deploy.yml`), run by hand from the Actions tab on `main`:
+  1. bump `version` in `package.json` and add a `## <version>` section to `CHANGELOG.md`, merge to `main`;
+  2. run the workflow: it tags the commit (e.g. `4.3.0`), creates the GitHub release with the changelog section as notes, builds and attaches the zips, then submits them to the Chrome Web Store and Firefox Add-ons.
 
-  ```
-  git tag v4.3.0 && git push origin v4.3.0
-  ```
-
-  This creates a GitHub release with the Chrome zip, the Firefox zip and a source zip (for Mozilla's review). If the `SUBMIT_KEYS` repository secret is set ([format](https://github.com/PlasmoHQ/bpp#usage)), the zips are also submitted to the Chrome Web Store and Firefox Add-ons. Without the secret, upload the zips from the release by hand.
+  Store submission needs the `SUBMIT_KEYS` repository secret ([format](https://github.com/PlasmoHQ/bpp#usage)). Untick "Submit to the browser stores" to only create the release.
 
 The version displayed in the extension comes from `package.json` (through the manifest), so it only needs to be changed there.
 

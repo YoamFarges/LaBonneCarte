@@ -1,0 +1,83 @@
+name: Release and deploy
+
+# Run by hand from the Actions tab, on main, once package.json and CHANGELOG.md are up to date:
+# 1. tags the current commit with the package.json version and creates the GitHub release
+#    (notes = the matching section of CHANGELOG.md),
+# 2. builds the zips and attaches them to the release (build.yml),
+# 3. submits them to the Chrome Web Store and Firefox Add-ons.
+on:
+  workflow_dispatch:
+    inputs:
+      stores:
+        description: "Submit to the browser stores"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Check the version was not released yet
+        run: |
+          V=${{ steps.version.outputs.version }}
+          if git ls-remote --exit-code --tags origin "refs/tags/$V" > /dev/null; then
+            echo "::error::Tag $V already exists. Bump the version in package.json first."
+            exit 1
+          fi
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          V=${{ steps.version.outputs.version }}
+          awk -v v="$V" '
+            $0 ~ "^## " { if (found) exit; if ($2 == v) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::No '## $V' section in CHANGELOG.md"
+            exit 1
+          fi
+          cat release-notes.md
+
+      - name: Create tag and GitHub release
+        run: |
+          V=${{ steps.version.outputs.version }}
+          gh release create "$V" --target "$GITHUB_SHA" --title "$V" --notes-file release-notes.md
+
+  build:
+    needs: release
+    uses: ./.github/workflows/build.yml
+    with:
+      tag: ${{ needs.release.outputs.version }}
+
+  stores:
+    needs: [release, build]
+    if: inputs.stores
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      V: ${{ needs.release.outputs.version }}
+    steps:
+      - name: Download the release zips
+        run: gh release download "$V" --repo "$GITHUB_REPOSITORY" --pattern "labonnecarte-$V-*.zip" --dir build
+
+      # Requires the SUBMIT_KEYS secret (see https://github.com/PlasmoHQ/bpp#usage).
+      - name: Submit to browser stores
+        uses: PlasmoHQ/bpp@v3
+        with:
+          keys: ${{ secrets.SUBMIT_KEYS }}
+          chrome-file: build/labonnecarte-${{ needs.release.outputs.version }}-chrome.zip
+          firefox-file: build/labonnecarte-${{ needs.release.outputs.version }}-firefox.zip
