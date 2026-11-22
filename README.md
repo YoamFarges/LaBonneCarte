@@ -45,7 +45,7 @@ npm run build:all      # Chrome + Firefox zips in build/
   1. bump `version` in `package.json` and add a `## <version>` section to `CHANGELOG.md`, merge to `main`;
   2. run the workflow: it tags the commit (e.g. `4.3.0`), creates the GitHub release with the changelog section as notes, builds and attaches the zips, then submits them to the Chrome Web Store and Firefox Add-ons.
 
-  Store submission needs these repository secrets (a store is skipped if its secrets are missing). Untick "Submit to the browser stores" to only create the release.
+  The "Stores" option: `publish` uploads and submits for review, `draft` uploads only (submit by hand in the store dashboard), `skip` only creates the GitHub release. Before creating anything, the workflow checks that the Chrome credentials work. Store submission needs these repository secrets (a store is skipped if its secrets are missing):
   - Chrome: `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN` (OAuth client of the Google Cloud project, refresh token from `npx chrome-webstore-upload-keys`)
   - Firefox: `FIREFOX_API_KEY` (JWT issuer), `FIREFOX_API_SECRET` (JWT secret), `FIREFOX_EXT_ID` (add-on UUID)
 
