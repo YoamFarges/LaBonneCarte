@@ -74,11 +74,42 @@ jobs:
       - name: Download the release zips
         run: gh release download "$V" --repo "$GITHUB_REPOSITORY" --pattern "labonnecarte-$V-*.zip" --dir build
 
-      # Requires the SUBMIT_KEYS secret (see https://github.com/PlasmoHQ/bpp#usage).
+      # Build the keys JSON expected by bpp (https://github.com/PlasmoHQ/bpp#usage) from one secret per value.
+      # A store is skipped when its secrets are not set.
+      - name: Prepare store keys
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          FIREFOX_API_KEY: ${{ secrets.FIREFOX_API_KEY }}
+          FIREFOX_API_SECRET: ${{ secrets.FIREFOX_API_SECRET }}
+          FIREFOX_EXT_ID: ${{ secrets.FIREFOX_EXT_ID }}
+        run: |
+          keys=$(jq -n \
+            --arg cId "$CHROME_CLIENT_ID" --arg cSecret "$CHROME_CLIENT_SECRET" --arg cToken "$CHROME_REFRESH_TOKEN" \
+            --arg fKey "$FIREFOX_API_KEY" --arg fSecret "$FIREFOX_API_SECRET" --arg fId "$FIREFOX_EXT_ID" '
+            {}
+            + (if $cId != "" and $cSecret != "" and $cToken != "" then
+                {chrome: {extId: "oegacpncaonolgbpmphcimodilfoacnl", clientId: $cId, clientSecret: $cSecret, refreshToken: $cToken}}
+               else {} end)
+            + (if $fKey != "" and $fSecret != "" and $fId != "" then
+                {firefox: {extId: $fId, apiKey: $fKey, apiSecret: $fSecret}}
+               else {} end)')
+          if [ "$keys" = "{}" ]; then
+            echo "::error::No store secrets set (CHROME_* or FIREFOX_*)"
+            exit 1
+          fi
+          echo "Submitting to: $(echo "$keys" | jq -r 'keys | join(", ")')"
+          {
+            echo "BPP_KEYS<<EOF_KEYS"
+            echo "$keys"
+            echo "EOF_KEYS"
+          } >> "$GITHUB_ENV"
+
       - name: Submit to browser stores
         uses: PlasmoHQ/bpp@v3
         with:
-          keys: ${{ secrets.SUBMIT_KEYS }}
+          keys: ${{ env.BPP_KEYS }}
           chrome-file: build/labonnecarte-${{ needs.release.outputs.version }}-chrome.zip
           firefox-file: build/labonnecarte-${{ needs.release.outputs.version }}-firefox.zip
           # Unminified source code for Mozilla's review.

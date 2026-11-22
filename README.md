@@ -45,7 +45,9 @@ npm run build:all      # Chrome + Firefox zips in build/
   1. bump `version` in `package.json` and add a `## <version>` section to `CHANGELOG.md`, merge to `main`;
   2. run the workflow: it tags the commit (e.g. `4.3.0`), creates the GitHub release with the changelog section as notes, builds and attaches the zips, then submits them to the Chrome Web Store and Firefox Add-ons.
 
-  Store submission needs the `SUBMIT_KEYS` repository secret ([format](https://github.com/PlasmoHQ/bpp#usage)). Untick "Submit to the browser stores" to only create the release.
+  Store submission needs these repository secrets (a store is skipped if its secrets are missing). Untick "Submit to the browser stores" to only create the release.
+  - Chrome: `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN` (OAuth client of the Google Cloud project, refresh token from `npx chrome-webstore-upload-keys`)
+  - Firefox: `FIREFOX_API_KEY` (JWT issuer), `FIREFOX_API_SECRET` (JWT secret), `FIREFOX_EXT_ID` (add-on UUID)
 
 The version displayed in the extension comes from `package.json` (through the manifest), so it only needs to be changed there.
 
