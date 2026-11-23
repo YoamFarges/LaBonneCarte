@@ -2,6 +2,10 @@
 
 The section matching the version in `package.json` is used as the GitHub release notes.
 
+## 4.3.1
+
+- Technical update, no visible change
+
 ## 4.3.0
 
 - Fixed missing ads on some pages (car listings showed nothing)
