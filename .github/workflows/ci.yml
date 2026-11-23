@@ -8,9 +8,6 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  # Parcel's worker threads crash with a segmentation fault on Linux runners (any Node version).
-  PARCEL_WORKERS: 0
 
 jobs:
   checks:
